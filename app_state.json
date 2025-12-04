@@ -5,67 +5,586 @@
       "index": 0,
       "path": "D:\\songs\\cureforme.mp3",
       "likedCount": 0,
-      "is_playing": false
+      "is_playing": false,
+      "cover": ""
     },
     {
       "id": "t_mirnv1lm_1",
       "index": 1,
       "path": "D:\\songs\\flowerdance.mp3",
-      "likedCount": 0,
-      "is_playing": false
+      "likedCount": 1,
+      "is_playing": false,
+      "cover": ""
     },
     {
       "id": "t_mirnv1lm_2",
       "index": 2,
       "path": "D:\\songs\\forthedamagedcoda.mp3",
       "likedCount": 0,
-      "is_playing": false
+      "is_playing": false,
+      "cover": ""
     },
     {
       "id": "t_mirnv1lm_3",
       "index": 3,
       "path": "D:\\songs\\justlikethis.mp3",
       "likedCount": 0,
-      "is_playing": false
+      "is_playing": false,
+      "cover": ""
     },
     {
       "id": "t_mirnv1lm_4",
       "index": 4,
       "path": "D:\\songs\\legendsneverdie.mp3",
       "likedCount": 0,
-      "is_playing": false
+      "is_playing": false,
+      "cover": ""
     },
     {
       "id": "t_mirnv1lm_5",
       "index": 5,
       "path": "D:\\songs\\nevada.mp3",
       "likedCount": 0,
-      "is_playing": false
+      "is_playing": false,
+      "cover": ""
     },
     {
       "id": "t_mirnv1lm_6",
       "index": 6,
       "path": "D:\\songs\\octopus.mp3",
       "likedCount": 0,
-      "is_playing": false
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_0",
+      "index": 7,
+      "path": "D:\\songs\\aliez.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_1",
+      "index": 8,
+      "path": "D:\\songs\\attention.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_2",
+      "index": 9,
+      "path": "D:\\songs\\babyi'msorry.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_3",
+      "index": 10,
+      "path": "D:\\songs\\bleedinglove.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_4",
+      "index": 11,
+      "path": "D:\\songs\\butterfly.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_5",
+      "index": 12,
+      "path": "D:\\songs\\croatianrhapsody.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_6",
+      "index": 13,
+      "path": "D:\\songs\\onelastkiss.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_7",
+      "index": 14,
+      "path": "D:\\songs\\onenightinshanghai.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_8",
+      "index": 15,
+      "path": "D:\\songs\\seasons.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_9",
+      "index": 16,
+      "path": "D:\\songs\\stay.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_10",
+      "index": 17,
+      "path": "D:\\songs\\ta.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_11",
+      "index": 18,
+      "path": "D:\\songs\\teeth.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_12",
+      "index": 19,
+      "path": "D:\\songs\\thatgirl.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_13",
+      "index": 20,
+      "path": "D:\\songs\\unamattina.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_14",
+      "index": 21,
+      "path": "D:\\songs\\unravel.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_15",
+      "index": 22,
+      "path": "D:\\songs\\把回忆拼好给你.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_16",
+      "index": 23,
+      "path": "D:\\songs\\白月光与朱砂痣.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_17",
+      "index": 24,
+      "path": "D:\\songs\\卜卦.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_18",
+      "index": 25,
+      "path": "D:\\songs\\赤伶.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_19",
+      "index": 26,
+      "path": "D:\\songs\\丑八怪.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_20",
+      "index": 27,
+      "path": "D:\\songs\\出山.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_21",
+      "index": 28,
+      "path": "D:\\songs\\春娇与志明.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_22",
+      "index": 29,
+      "path": "D:\\songs\\春庭雪.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_23",
+      "index": 30,
+      "path": "D:\\songs\\达拉崩吧.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_24",
+      "index": 31,
+      "path": "D:\\songs\\帝都.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_25",
+      "index": 32,
+      "path": "D:\\songs\\冬眠.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_26",
+      "index": 33,
+      "path": "D:\\songs\\风错过雨.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_27",
+      "index": 34,
+      "path": "D:\\songs\\关山酒.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_28",
+      "index": 35,
+      "path": "D:\\songs\\火星人来过.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_29",
+      "index": 36,
+      "path": "D:\\songs\\记念.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_30",
+      "index": 37,
+      "path": "D:\\songs\\寂寞在唱歌.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_31",
+      "index": 38,
+      "path": "D:\\songs\\鲸.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_32",
+      "index": 39,
+      "path": "D:\\songs\\静悄悄.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_33",
+      "index": 40,
+      "path": "D:\\songs\\肯定.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_34",
+      "index": 41,
+      "path": "D:\\songs\\浪人琵琶.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_35",
+      "index": 42,
+      "path": "D:\\songs\\凉凉.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_36",
+      "index": 43,
+      "path": "D:\\songs\\满庭芳.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_37",
+      "index": 44,
+      "path": "D:\\songs\\芒种.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_38",
+      "index": 45,
+      "path": "D:\\songs\\琵琶行.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_39",
+      "index": 46,
+      "path": "D:\\songs\\起风了.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_40",
+      "index": 47,
+      "path": "D:\\songs\\千夜.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_41",
+      "index": 48,
+      "path": "D:\\songs\\青鸟.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_42",
+      "index": 49,
+      "path": "D:\\songs\\去年花开.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_43",
+      "index": 50,
+      "path": "D:\\songs\\神女劈观.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_44",
+      "index": 51,
+      "path": "D:\\songs\\生命.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_45",
+      "index": 52,
+      "path": "D:\\songs\\素颜.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_46",
+      "index": 53,
+      "path": "D:\\songs\\童话镇.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_47",
+      "index": 54,
+      "path": "D:\\songs\\吻得太逼真.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_48",
+      "index": 55,
+      "path": "D:\\songs\\我的战争.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_49",
+      "index": 56,
+      "path": "D:\\songs\\我期待的不是雪.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_50",
+      "index": 57,
+      "path": "D:\\songs\\我用什么把你留住.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_51",
+      "index": 58,
+      "path": "D:\\songs\\五月雨.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_52",
+      "index": 59,
+      "path": "D:\\songs\\雾里.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_53",
+      "index": 60,
+      "path": "D:\\songs\\星间旅行.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_54",
+      "index": 61,
+      "path": "D:\\songs\\兄弟抱一下.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_55",
+      "index": 62,
+      "path": "D:\\songs\\悬溺.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_56",
+      "index": 63,
+      "path": "D:\\songs\\烟花易冷.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_57",
+      "index": 64,
+      "path": "D:\\songs\\燕无歇.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_58",
+      "index": 65,
+      "path": "D:\\songs\\一路生花.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_59",
+      "index": 66,
+      "path": "D:\\songs\\遗失的心跳.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_60",
+      "index": 67,
+      "path": "D:\\songs\\虞叹兮.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_61",
+      "index": 68,
+      "path": "D:\\songs\\谪仙.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_62",
+      "index": 69,
+      "path": "D:\\songs\\只因你太美.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
+    },
+    {
+      "id": "t_mirq36jr_63",
+      "index": 70,
+      "path": "D:\\songs\\最后的旅行.mp3",
+      "likedCount": 0,
+      "is_playing": false,
+      "cover": ""
     }
   ],
   "current_track": {
-    "id": "t_mirnv1lm_3",
-    "index": 3,
-    "path": "D:\\songs\\justlikethis.mp3",
-    "position": 5.166538,
-    "duration": 290.06367346938777,
-    "title": "Just Like This",
-    "artist": "Deepmaniak",
+    "id": "t_mirq36jr_17",
+    "index": 24,
+    "path": "D:\\songs\\卜卦.mp3",
+    "position": 0,
+    "duration": 0,
+    "title": "卜卦.mp3",
+    "artist": null,
     "likedCount": 0,
     "is_playing": false
   },
   "play_mode": "single_loop",
   "last_session": {
-    "id": "t_mirnv1lm_3",
-    "path": "D:\\songs\\justlikethis.mp3",
-    "position": 5.166538,
+    "id": "t_mirq36jr_17",
+    "path": "D:\\songs\\卜卦.mp3",
+    "position": 0,
     "play_mode": "single_loop"
   },
   "settings": {}

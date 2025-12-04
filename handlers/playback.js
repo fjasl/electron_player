@@ -1,6 +1,6 @@
 // handlers/playback.js
 const path = require("path");
-const { extractTracksMetadata } = require("../metadata");
+const { extractTracksMetadata,extractCoverArt } = require("../metadata");
 
 /** UI 的模式到后端模式映射 */
 function mapUiModeToPlayMode(mode) {
@@ -56,9 +56,11 @@ async function switchToIndex(index, ctx) {
   let title = path.basename(track.path);
   let artist = null;
   let duration = 0;
+  let cover = "";
 
   try {
     const metas = await extractTracksMetadata([track.path]);
+    cover = await extractCoverArt(track.path);
     const meta = metas[0];
     if (meta) {
       title = meta.title || title;
@@ -79,6 +81,7 @@ async function switchToIndex(index, ctx) {
     artist,
     duration,
     liked: !!currentLiked,
+    cover,
   });
 
   // 切歌后默认从头开始播
@@ -171,14 +174,14 @@ async function handleSetPlayMode(payload, ctx) {
 /** 跳转进度（percent: 0~1） */
 async function handleSeek(payload, ctx) {
   const { stateStore, storage, eventBus } = ctx;
-  const percent = payload?.percent;
-  if (typeof percent !== "number") return;
+  const position = payload?.position;
+  if (typeof position !== "number") return;
 
   const ct = stateStore.get("current_track");
   const duration = ct.duration || 0;
   let newPos = 0;
   if (duration > 0) {
-    newPos = Math.max(0, Math.min(duration, percent * duration));
+    newPos = position;
   }
 
   stateStore.updateCurrentPosition(newPos);
@@ -212,7 +215,7 @@ async function handlePositionReport(payload, ctx) {
   eventBus.emit("position_changed", {
     current: stateStore.get("current_track"),
   });
-  console.log("[handlePositionReport]:"+stateStore.state.current_track.position);
+  // console.log("[handlePositionReport]:"+stateStore.state.current_track.position);
 }
 
 
@@ -235,6 +238,12 @@ async function handleLike(_payload, ctx) {
   console.log("[like] 当前曲目 likedCount:", stateStore.get("current_track").likedCount);
 }
 
+async function handleCoverrequest(_payload, ctx) {
+  const {stateStore,storage, eventBus} = ctx;
+  eventBus.emit("cover_reply", {
+    current: stateStore.state.current_track.cover,
+  });
+}
 
 /** 对外：注册所有播放相关的 intent */
 function registerPlaybackHandlers(stateMachine) {
@@ -246,6 +255,7 @@ function registerPlaybackHandlers(stateMachine) {
   stateMachine.registerHandler("seek", handleSeek);
   stateMachine.registerHandler("position_report", handlePositionReport);
   stateMachine.registerHandler("like", handleLike);
+  stateMachine.registerHandler("cover_request",handleCoverrequest);
 }
 
 module.exports = {

@@ -29,6 +29,8 @@ const audioManager = new AudioManager("player_audio");
 // 记录当前 audio 正在播放的那一首（用后端的 track.id）
 let currentAudioTrackId = null;
 
+const discoManager = new DiscoManager();
+
 // ============== AudioManager → 后端 / UI ==============
 
 // audioManager.callbacks.onPlayStateChange = (isPlaying) => {
@@ -185,7 +187,7 @@ function highlightCurrentTrack(current) {
 
 // 监听后端 EventBus 发来的事件
 ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
-  console.log("[frontend] backend-event:", name, payload);
+  // console.log("[frontend] backend-event:", name, payload);
 
   // 播放列表变更
   if (name === "playlist_changed") {
@@ -217,6 +219,7 @@ ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
         console.log("[frontend] loadAndPlay:", current.path, "from", position);
         audioManager.load(current.path, position || 0);
         currentAudioTrackId = current.id;
+        sendIntent("cover_request", {});
       console.log("[frontend] load:", current.path, "from", position);
      }
 
@@ -228,10 +231,11 @@ ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
   // 播放状态来自后端（主要是同步给 UI，真正驱动的是 <audio>）
   if (name === "play_state_changed") {
     const isPlaying = payload?.is_playing;
-    console.log("[event:play_state_changed] isPlaying =", isPlaying);
+    // console.log("[event:play_state_changed] isPlaying =", isPlaying);
     playUI.setPlayState(isPlaying);
     audioManager.setPlaying(isPlaying);
     audioManager.reportProgress(isPlaying);
+    discoManager.toggleRotation(isPlaying);
     return;
   }
 
@@ -241,5 +245,9 @@ ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
     const uiMode = backendMode === "shuffle" ? "shuffle" : "one";
     playUI.setMode(uiMode);
     return;
+  }
+
+  if(name==="cover_reply"){
+    discoManager.setCover(payload?.cover ||"");
   }
 });

@@ -28,7 +28,7 @@ function initBackend(win) {
   // 3. 建立前端 → 后端：通用意图入口
   ipcMain.on("frontend-intent", (_event, msg) => {
     const { intent, payload } = msg || {};
-    console.log("[IPC] frontend-intent:", intent, payload);
+    // console.log("[IPC] frontend-intent:", intent, payload);
     if (!intent) return;
     stateMachine.dispatch(intent, payload);
   });

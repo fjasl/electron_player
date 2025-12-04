@@ -3,6 +3,9 @@ const fs = require("fs");
 const path = require("path");
 const mm = require("music-metadata");
 
+function bufferToBase64DataURI(buffer, format) {
+  return `data:${format};base64,${buffer.toString("base64")}`;
+}
 /**
  * 解析单个文件的元数据
  * - path       : 完整路径
@@ -63,6 +66,24 @@ async function extractTracksMetadata(filePaths) {
   return result;
 }
 
+async function extractCoverArt(filePath) {
+  try {
+    // 使用 music-metadata 解析文件，只请求图片信息可以稍微提高效率
+    const metadata = await mm.parseFile(filePath, {
+      duration: false,
+      skipCovers: false,
+    });
+    const common = metadata.common || {};
+
+    if (common.picture && common.picture.length > 0) {
+      const picture = common.picture[0];
+      return bufferToBase64DataURI(picture.data, picture.format);
+    }
+  } catch (e) {
+    console.warn("[metadata] cover art parse fail:", filePath, e.message);
+  }
+  return null;
+}
 module.exports = {
   extractTracksMetadata,
 };
