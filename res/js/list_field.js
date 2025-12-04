@@ -5,6 +5,7 @@ class ListUIController {
     this.listBox = document.getElementById("list_box");
     this.filePickBtn = document.getElementById("file_pick_btn");
     this.locateBtn = document.getElementById("list_locate_btn");
+    this.findBtn = document.getElementById("list_find_btn");
 
     this.nextId = 1;
     /** 真实歌曲项（不含搜索条） */
@@ -16,13 +17,13 @@ class ListUIController {
 
     // 对接后端的回调
     this.callbacks = {
-      onItemPlay: null,       // 双击播放 (itemData)
-      onItemSelect: null,     // 单击选中 (itemData)
-      onItemAdded: null,      // 添加完成 (itemData)
+      onItemPlay: null, // 双击播放 (itemData)
+      onItemSelect: null, // 单击选中 (itemData)
+      onItemAdded: null, // 添加完成 (itemData)
       // 这里的 onItemRemoved = 用户点击删除按钮（删除请求）
-      onItemRemoved: null,    // (itemData)
-      onFilePickClick: null,  // 点左侧文件夹按钮
-      onFilterChange: null,   // 搜索关键字变化 (keyword)
+      onItemRemoved: null, // (itemData)
+      onFilePickClick: null, // 点左侧文件夹按钮
+      onFilterChange: null, // 搜索关键字变化 (keyword)
     };
 
     this._initExistingItems();
@@ -34,9 +35,7 @@ class ListUIController {
   _initExistingItems() {
     if (!this.listBox) return;
 
-    const domItems = Array.from(
-      this.listBox.querySelectorAll(".list_item")
-    );
+    const domItems = Array.from(this.listBox.querySelectorAll(".list_item"));
 
     domItems.forEach((el) => {
       // 跳过以后如果有的搜索条
@@ -94,6 +93,10 @@ class ListUIController {
       this.setCurrentItem(itemData.id);
       this.callbacks.onItemSelect?.(itemData);
     });
+
+    this.findBtn.addEventListener("click",()=>{
+      this.scrollToCurrentItem();
+    })
 
     // 双击：播放
     el.addEventListener("dblclick", (e) => {
@@ -208,6 +211,33 @@ class ListUIController {
     return this.items.find((it) => it.id === this.currentId) || null;
   }
 
+  getCurrentItem() {
+    return this.items.find((it) => it.id === this.currentId) || null;
+  }
+
+  /**
+   * 将当前选中的项目滚动到视图中央（如果可能）
+   * @param {string} [id=this.currentId] - 要滚动的项目ID，默认为当前选中项ID
+   */
+  scrollToCurrentItem(id = this.currentId) {
+    if (!id) return;
+
+    const item = this.items.find((it) => it.id === id);
+    if (!item || !item.el) return;
+
+    // 使用原生的 scrollIntoView 方法
+    // behavior: 'smooth' 提供平滑滚动动画
+    // block: 'center' 尝试将元素顶部与容器中心对齐
+    item.el.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest", // 垂直方向对齐到中央
+      // inline: 'nearest' // 水平方向只在需要时滚动（这里不需要）
+    });
+
+    // 如果您的列表项不在 listBox 而是其他可滚动容器中，
+    // 确保该容器设置了正确的 CSS overflow 属性（如 overflow-y: auto/scroll）。
+  }
+
   // ================== 搜索条（列表项形态） ==================
 
   toggleSearchRow() {
@@ -268,11 +298,7 @@ class ListUIController {
     const { el } = this.searchRow;
 
     el.classList.add("list_item--leave");
-    el.addEventListener(
-      "animationend",
-      () => el.remove(),
-      { once: true }
-    );
+    el.addEventListener("animationend", () => el.remove(), { once: true });
 
     this.searchRow = null;
     this.applyFilter(""); // 恢复全部可见

@@ -71,7 +71,13 @@
   font-size: 20px;
   color: white;
 }
-
+#list_find_btn{
+  cursor: pointer;
+}
+#list_find_btn i{
+  font-size: 22px;
+  color: white;
+}
 /* ========== 入场：从上方偏左滑入 + 轻微弹性 ========== */
 @keyframes listItemEnterFromTopLeft {
   0% {

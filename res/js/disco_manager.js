@@ -15,7 +15,7 @@ class DiscoManager {
         }
 
         // 默认旋转速率 (角度/秒)。负值表示反向旋转。
-        this.rotationRateDegreesPerSecond = 3; // 90度/秒
+        this.rotationRateDegreesPerSecond = 15; // 90度/秒
         this.isPlaying = false;
         
         this.lastTime = null; // 用于 tracking requestAnimationFrame 的时间

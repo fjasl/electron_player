@@ -204,7 +204,7 @@ async function handleSeek(payload, ctx) {
   });
 }
 
-/** 跳转进度（percent: 0~1） */
+/** 处理前端上报 */
 async function handlePositionReport(payload, ctx) {
   const { stateStore, storage, eventBus } = ctx;
   const position = payload?.position;
@@ -219,7 +219,7 @@ async function handlePositionReport(payload, ctx) {
 
   stateStore.updateCurrentPosition(newPos);
   stateStore.snapshotLastSession();
-  storage.saveState(stateStore.getState());
+  // storage.saveState(stateStore.getState());
 
   // 仍然复用 current_track_changed，把 position 带出去
   eventBus.emit("position_changed", {

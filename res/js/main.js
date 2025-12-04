@@ -13,6 +13,7 @@ function titleFromPath(p) {
   const parts = p.split(/[\\/]/);
   return parts[parts.length - 1] || p;
 }
+const tabController = new TabController();
 
 // 播放 UI 控制
 const playUI = new PlayUIController();
@@ -52,6 +53,10 @@ audioManager.callbacks.onEnded = () => {
 // ============== 播放界面 → AudioManager / 后端意图 ==============
 
 // 播放/暂停：只控制 <audio>，后端通过 audio 事件感知
+playUI.callbacks.onReturn = () => {
+  tabController.switchTab("list");
+}
+
 playUI.callbacks.onPlayToggle = () => {
   console.log("[frontend] 播放按钮切换：", );
   // audioManager.setPlaying(isPlaying);
@@ -88,7 +93,8 @@ playUI.callbacks.onSeek = (percent) => {
 };
 
 playUI.callbacks.onLyricJump = () => {
-  console.log("[frontend] 跳转歌词界面（暂未实现）");
+  console.log("[frontend] 跳转歌词界界面");
+  tabController.switchTab("lyric");
 };
 
 // ============== 列表界面 → 后端意图 ==============

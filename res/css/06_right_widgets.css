@@ -33,7 +33,7 @@
 #progress_fill {
   position: absolute;
   inset: 0;
-  width: 30%; /* 先写死 30%，后面用 JS 改百分比 */
+  width: 0%; /* 先写死 30%，后面用 JS 改百分比 */
   background: linear-gradient(to right, #ffffff, rgba(255, 255, 255, 0.7));
   border-radius: inherit;
   transition: width 0.2s ease;

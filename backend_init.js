@@ -56,6 +56,7 @@ function initBackend(win) {
       eventBus.emit("current_track_changed", { current: ct });
     }
   });
+  return stateStore;
 }
 
 module.exports = {

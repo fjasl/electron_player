@@ -7,6 +7,7 @@ class PlayUIController {
       artist: document.getElementById("songartist"),
 
       // 控制按钮
+      btnRetu: document.getElementById("return_btn"),
       btnPlay: document.getElementById("control_play_btn"),
       btnNext: document.getElementById("control_next_btn"),
       btnPrev: document.getElementById("control_forward_btn"),
@@ -35,6 +36,7 @@ class PlayUIController {
 
     // 回调接口（让后端 / 播放核心接管）
     this.callbacks = {
+      onReturn: null,
       onPlayToggle: null,
       onNext: null,
       onPrev: null,
@@ -51,6 +53,10 @@ class PlayUIController {
   // 事件绑定
   // ================================
   bindEvents() {
+    //返回
+    this.dom.btnRetu.addEventListener("click", () => {
+      this.callbacks.onReturn?.();
+    });
     // 播放/暂停
     this.dom.btnPlay.addEventListener("click", () => {
       // this.togglePlayUI();
@@ -76,7 +82,6 @@ class PlayUIController {
         this.callbacks.onLikeToggle?.();
       }
       // 只有第一次点，才会把“我点了一下”这个意图丢给后端
-      
     });
 
     // 播放模式切换
@@ -174,11 +179,9 @@ class PlayUIController {
   }
 
   updateModeUI(mode) {
-
     const icon = this.dom.btnPlayMode.querySelector("i");
     if (mode === "single_loop") icon.className = "fa-solid fa-repeat";
-    else if (mode === "shuffle")
-      icon.className = "fa-solid fa-shuffle";
+    else if (mode === "shuffle") icon.className = "fa-solid fa-shuffle";
   }
 
   // ================================
