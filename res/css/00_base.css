@@ -1,0 +1,85 @@
+/* 200 ExtraLight 极细 */
+@font-face {
+  font-family: "SourceHanSansSC";
+  src: url("../font/SourceHanSansSC-ExtraLight.otf") format("opentype");
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 300 Light 细体 */
+@font-face {
+  font-family: "SourceHanSansSC";
+  src: url("../font/SourceHanSansSC-Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 400 Regular 常规（建议用这个做默认） */
+@font-face {
+  font-family: "SourceHanSansSC";
+  src: url("../font/SourceHanSansSC-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 500 Medium 中等粗 */
+@font-face {
+  font-family: "SourceHanSansSC";
+  src: url("../font/SourceHanSansSC-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 700 Bold 粗体 */
+@font-face {
+  font-family: "SourceHanSansSC";
+  src: url("../font/SourceHanSansSC-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 900 Heavy 特粗 */
+@font-face {
+  font-family: "SourceHanSansSC";
+  src: url("../font/SourceHanSansSC-Heavy.otf") format("opentype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+::selection {
+  background-color: transparent;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent; /* ★ 窗口其余区域完全透明 */
+  font-family: "SourceHanSansSC";
+  font-weight: 400; /* 默认常规 */
+}
+
+.text_ellipsis {
+  white-space: nowrap; /* 不换行 */
+  overflow: hidden; /* 隐藏超出 */
+  text-overflow: ellipsis; /* 显示 … */
+}
+

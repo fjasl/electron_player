@@ -1,0 +1,190 @@
+#songtitle {
+  /* 用你全局的思源字体 */
+  font-family: "SourceHanSansSC", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "PingFang SC", "Microsoft YaHei", sans-serif;
+
+  font-size: 20px; /* 略大一点的标题 */
+  font-weight: 700; /* 稍微粗一点，看起来更像标题 */
+  color: #ffffff; /* 亮一些 */
+  line-height: 1.2;
+}
+#songartist {
+  font-family: "SourceHanSansSC", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "PingFang SC", "Microsoft YaHei", sans-serif;
+
+  font-size: 15px; /* 比标题小一号 */
+  font-weight: 400; /* 正常字重 */
+  color: rgba(255, 255, 255, 0.6); /* 暗一点，偏灰的白 */
+  line-height: 1.2;
+}
+.func_set_btn {
+  cursor: pointer;
+  font-size: 20px;
+}
+#progress_track {
+  position: relative;
+  width: 100%;
+  height: 20%;
+  background: rgba(255, 255, 255, 0.08); /* 深灰轨道 */
+  border-radius: 999px;
+  overflow: hidden;
+  cursor: pointer;
+}
+#progress_fill {
+  position: absolute;
+  inset: 0;
+  width: 30%; /* 先写死 30%，后面用 JS 改百分比 */
+  background: linear-gradient(to right, #ffffff, rgba(255, 255, 255, 0.7));
+  border-radius: inherit;
+  transition: width 0.2s ease;
+}
+
+#progress_track:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+#progress_time {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#position,
+#duration {
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* #control_btn {
+  --btn-size: 2.8rem;  
+
+  width: var(--btn-size);
+  height: var(--btn-size);
+  border-radius: 50%;
+  border: none;
+  outline: none;
+  cursor: pointer;
+
+  background: #2f3034; 
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #ffffff;
+  font-size: 1rem;
+
+ 
+  box-shadow:
+    0.25rem 0.25rem 0.5rem rgba(0, 0, 0, 0.75),      
+    -0.25rem -0.25rem 0.5rem rgba(255, 255, 255, 0.05); 
+
+  transition:
+    box-shadow 0.15s ease,
+    transform 0.15s ease,
+    background 0.15s ease;
+} */
+#control_play_btn {
+  font-size: 30px;
+  cursor: pointer;
+}
+#control_forward_btn {
+  font-size: 20px;
+  cursor: pointer;
+}
+#control_next_btn {
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* #disco {
+  width: 90%;
+  aspect-ratio: 1 / 1;
+  background-color: bisque;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+} */
+/* 黑胶盘主体 */
+#disco {
+  width: 90%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  position: relative;
+
+  /* 黑胶的整体底色和渐变 */
+  background: radial-gradient(
+    circle at 50% 50%,
+    #000000 0%,
+    #020202 32%,
+    #050505 60%,
+    #000000 100%
+  );
+
+  /* 让唱片“浮起来”的阴影 */
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+}
+/* 黑胶高光反光层 */
+#disco::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+
+  /* 斜着的一块高光：上左亮，下右透明 */
+  background:
+    radial-gradient(
+      circle at 20% 0%,
+      rgba(255, 255, 255, 0.28) 0%,
+      rgba(255, 255, 255, 0.08) 22%,
+      rgba(0, 0, 0, 0) 60%
+    );
+
+  /* 略微旋转一点，看起来像斜向反光 */
+  transform: rotate(-20deg);
+
+  opacity: 0.9;        /* 整体强度，太亮就调小 */
+  mix-blend-mode: screen;  /* 让高光和下面的黑胶更自然融合，可选 */
+}
+#disco::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+
+  /* 斜着的一块高光：上左亮，下右透明 */
+  background:
+    radial-gradient(
+      circle at 20% 0%,
+      rgba(255, 255, 255, 0.28) 0%,
+      rgba(255, 255, 255, 0.08) 22%,
+      rgba(0, 0, 0, 0) 60%
+    );
+
+  /* 略微旋转一点，看起来像斜向反光 */
+  transform: rotate(160deg);
+
+  opacity: 0.9;        /* 整体强度，太亮就调小 */
+  mix-blend-mode: screen;  /* 让高光和下面的黑胶更自然融合，可选 */
+}
+
+#disco_cover {
+  width: 75%;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#disco_cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

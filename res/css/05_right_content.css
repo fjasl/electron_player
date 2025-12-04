@@ -1,0 +1,141 @@
+#return_btn {
+  cursor: pointer;
+}
+#return_btn i {
+  font-size: 25px;
+  color: white;
+}
+#songinfo {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: start;
+}
+#funcset_box {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+#progressbar_box {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+#control_box {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+#file_pick_btn {
+  cursor: pointer;
+}
+#file_pick_btn i {
+  font-size: 20px;
+  color: white;
+}
+.list_item {
+  flex: 0 0 20%;
+  width: 100%;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-left-color: transparent;
+  border-right-color: transparent;
+  background: rgba(255, 255, 255, 0.02);
+  color: #ffffffd5;
+  cursor: pointer;
+  user-select: none;
+  transition: 0.18s ease;
+}
+.list_item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+#list_locate_btn {
+  cursor: pointer;
+}
+#list_locate_btn i {
+  font-size: 20px;
+  color: white;
+}
+
+/* ========== 入场：从上方偏左滑入 + 轻微弹性 ========== */
+@keyframes listItemEnterFromTopLeft {
+  0% {
+    opacity: 0;
+    transform: translate3d(-22px, -16px, 0) scale(0.9);
+  }
+  60% {
+    opacity: 1;
+    transform: translate3d(4px, 3px, 0) scale(1.03);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.list_item--enter {
+  animation: listItemEnterFromTopLeft 0.38s cubic-bezier(0.22, 1.2, 0.36, 1)
+    forwards;
+}
+
+/* ========== 出场：向右滑出 + 淡出 + 轻微回弹 ========== */
+@keyframes listItemLeaveToRight {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  40% {
+    transform: translate3d(8px, 0, 0) scale(0.98);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(40px, 0, 0) scale(0.94);
+  }
+}
+
+.list_item--leave {
+  animation: listItemLeaveToRight 0.3s cubic-bezier(0.22, 1.1, 0.45, 1) forwards;
+}
+
+/* ========== hover：轻微缩小 + 小幅左右晃动，持续 ========== */
+.list_item:hover {
+  transform: scale(0.97);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ========== 选中：轻微弹性缩小一下 ========== */
+@keyframes listItemSelectPulse {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(0.96);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.list_item--selectPulse {
+  animation: listItemSelectPulse 0.18s cubic-bezier(0.3, 0, 0.2, 1);
+}
+
+/* 选中的持久状态：背景亮一点 */
+.list_item--current {
+  background: rgba(255, 255, 255, 0.12);
+}

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title></title>
+    <link rel="stylesheet" href="res/css/fontawesome.css" />
+    <link rel="stylesheet" href="res/css/00_base.css" />
+    <link rel="stylesheet" href="res/css/01_main_box.css" />
+    <link rel="stylesheet" href="res/css/02_pane.css" />
+    <link rel="stylesheet" href="res/css/03_left_guide.css" />
+    <link rel="stylesheet" href="res/css/03_right_content.css" />
+    <link rel="stylesheet" href="res/css/04_left_guide_func.css" />
+    <link rel="stylesheet" href="res/css/04_right_content.css" />
+    <link rel="stylesheet" href="res/css/05_right_content.css" />
+    <link rel="stylesheet" href="res/css/06_right_widgets.css" />
+    <link rel="stylesheet" href="res/css/06_right_list_field.css">
+  </head>
+  <body>
+    <div id="main_box">
+      <div id="pane-left">
+        <div id="left_pane_logo">
+          <svg
+            id="svgloge"
+            viewBox="0 0 200 200"
+            xmlns="http://www.w3.org/2000/svg"
+            preserveAspectRatio="xMidYMid meet"
+          >
+            <!-- 纯黑背景 -->
+            <!-- <rect width="100%" height="100%" fill="" -->
+
+            <!-- 花体英文 yun -->
+            <text
+              x="50%"
+              y="50%"
+              fill="#ffffff"
+              text-anchor="middle"
+              dominant-baseline="middle"
+              font-family="Brush Script MT, 'Segoe Script', 'Comic Sans MS', cursive"
+              font-size="80"
+            >
+              yun
+            </text>
+          </svg>
+        </div>
+        <div id="left_pane_guide">
+          <div class="navigation_bar" id="Play_btn">
+            <i class="fa-solid fa-play"></i>
+          </div>
+          <div class="navigation_bar" id="lyric_btn">
+            <i class="fa-solid fa-file-lines"></i>
+          </div>
+          <div class="navigation_bar" id="list_btn">
+            <i class="fa-solid fa-list-ul"></i>
+          </div>
+          <div class="navigation_bar" id="setting_btn">
+            <i class="fa-solid fa-gear"></i>
+          </div>
+        </div>
+      </div>
+      <div id="pane-right">
+        <div id="content_play" class="tab_content">
+          <div id="return_btn_box">
+            <div id="return_btn">
+              <i class="fa-solid fa-angle-left"></i>
+            </div>
+          </div>
+          <div id="widgets">
+            <div id="songinfo">
+              <div id="songtitle" class="text_ellipsis">歌曲标题</div>
+              <div id="songartist" class="text_ellipsis">歌手</div>
+            </div>
+            <div id="funcset_box">
+              <div id="like_btn" class="func_set_btn">
+                <i class="fa-regular fa-heart"></i>
+              </div>
+              <div id="playmode_btn" class="func_set_btn">
+                <i class="fa-solid fa-repeat"></i>
+              </div>
+              <div id="lyricjump_btn" class="func_set_btn">
+                <i class="fa-solid fa-file-lines"></i>
+              </div>
+              <div id="volume_btn" class="func_set_btn">
+                <i class="fa-solid fa-volume-high"></i>
+              </div>
+            </div>
+            <div id="progressbar_box">
+              <div id="progress_track">
+                <div id="progress_fill"></div>
+              </div>
+              <div id="progress_time">
+                <div id="position" class="text_ellipsis">00:00</div>
+                <div id="duration" class="text_ellipsis">00:00</div>
+              </div>
+            </div>
+            <div id="control_box">
+              <div id="control_forward_btn" class="control_btn">
+                <i class="fa-solid fa-backward-step"></i>
+              </div>
+              <div id="control_play_btn" class="control_btn">
+                <i class="fa-solid fa-play"></i>
+              </div>
+              <div id="control_next_btn" class="control_btn">
+                <i class="fa-solid fa-forward-step"></i>
+              </div>
+            </div>
+          </div>
+          <div id="disco_box">
+            <div id="disco">
+              <div id="disco_cover"></div>
+            </div>
+          </div>
+        </div>
+        <div id="content_lyric" class="tab_content">歌词界面内容（占位）</div>
+        <div id="content_list" class="tab_content">
+          <div id="list_func">
+            <div id="file_pick_btn">
+              <i class="fa-solid fa-folder-open"></i>
+            </div>
+            <div id="list_locate_btn">
+              <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+          </div>
+          <div id="list_box">
+            <div class="list_item">
+              <div class="list_item_info">
+                <i class="fa-solid fa-music-note"></i>
+                <div class="text_ellipsis">示例歌曲标题 - 示例歌手</div>
+              </div>
+              <div class="list_item_del_box">
+                 <i class="fa-solid fa-trash-can"></i>
+            </div>
+            </div>
+            <div class="list_item">
+              <div class="list_item_info">
+                <i class="fa-solid fa-music-note"></i>
+                <div class="text_ellipsis">示例歌曲标题 - 示例歌手</div>
+              </div>
+              <div class="list_item_del_box">
+                 <i class="fa-solid fa-trash-can"></i>
+            </div>
+            </div>
+            <div class="list_item">
+              <div class="list_item_info">
+                <i class="fa-solid fa-music-note"></i>
+                <div class="text_ellipsis">示例歌曲标题 - 示例歌手</div>
+              </div>
+              <div class="list_item_del_box">
+                 <i class="fa-solid fa-trash-can"></i>
+            </div>
+            </div>
+            <div class="list_item">
+              <div class="list_item_info">
+                <i class="fa-solid fa-music-note"></i>
+                <div class="text_ellipsis">示例歌曲标题 - 示例歌手</div>
+              </div>
+              <div class="list_item_del_box">
+                 <i class="fa-solid fa-trash-can"></i>
+            </div>
+            </div>
+            <div class="list_item">
+              <div class="list_item_info">
+                <i class="fa-solid fa-music-note"></i>
+                <div class="text_ellipsis">示例歌曲标题 - 示例歌手</div>
+              </div>
+              <div class="list_item_del_box">
+                 <i class="fa-solid fa-trash-can"></i>
+            </div>
+            </div>
+            <div class="list_item">
+              <div class="list_item_info">
+                <i class="fa-solid fa-music-note"></i>
+                <div class="text_ellipsis">示例歌曲标题 - 示例歌手</div>
+              </div>
+              <div class="list_item_del_box">
+                 <i class="fa-solid fa-trash-can"></i>
+            </div>
+            </div>
+          </div>
+        </div>
+        <div id="content_setting" class="tab_content">设置界面内容（占位）</div>
+      </div>
+    </div>
+    <script src="res/js/menu.js"></script>
+    <script src="res/js/play_field.js"></script>
+    <script src="res/js/list_field.js"></script>
+    <script src="res/js/main.js"></script>
+  </body>
+</html>

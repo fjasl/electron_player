@@ -1,0 +1,17 @@
+#left_pane_logo{
+    flex:1;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: end;
+}
+#left_pane_guide{
+    width: 100%;
+    flex:3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap:10%;
+    -webkit-app-region: no-drag;
+}

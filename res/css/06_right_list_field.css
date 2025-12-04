@@ -1,0 +1,16 @@
+.list_item_info {
+    flex: 8;
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    gap: 10%;
+    padding: 0 0 0 5%;
+}
+
+.list_item_del_box {
+    flex: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

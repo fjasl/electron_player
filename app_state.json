@@ -1,0 +1,52 @@
+{
+  "playlist": [
+    {
+      "id": "t_mir7xhxw_3",
+      "index": 0,
+      "path": "D:\\songs\\冬眠.mp3",
+      "likedCount": 0
+    },
+    {
+      "id": "t_mir7xhxw_5",
+      "index": 1,
+      "path": "D:\\songs\\关山酒.mp3",
+      "likedCount": 0
+    },
+    {
+      "id": "t_mir7xhxw_6",
+      "index": 2,
+      "path": "D:\\songs\\火星人来过.mp3",
+      "likedCount": 0
+    },
+    {
+      "id": "t_mir7xhxw_7",
+      "index": 3,
+      "path": "D:\\songs\\记念.mp3",
+      "likedCount": 0
+    },
+    {
+      "id": "t_mir81x87_0",
+      "index": 4,
+      "path": "D:\\songs\\aliez.mp3",
+      "likedCount": 0
+    }
+  ],
+  "current_track": {
+    "id": "t_mir7xhxw_3",
+    "index": 0,
+    "path": "D:\\songs\\冬眠.mp3",
+    "position": 0,
+    "duration": 191.6865306122449,
+    "title": "冬眠·2023",
+    "artist": "阿YueYue",
+    "likedCount": 0
+  },
+  "play_mode": "single_loop",
+  "last_session": {
+    "id": "t_mir7xhxw_3",
+    "path": "D:\\songs\\冬眠.mp3",
+    "position": 0,
+    "play_mode": "single_loop"
+  },
+  "settings": {}
+}

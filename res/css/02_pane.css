@@ -1,0 +1,23 @@
+#pane-left {
+  flex: 0 0 10%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0,1);
+  border-radius: 16px;
+  overflow: hidden;
+  
+}
+
+/* 右侧面板 */
+#pane-right {
+  flex: 1;
+  margin-left: 2%;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 1);
+  color:white;
+  position: relative; /* 作为四个页面的定位参考 */
+  overflow: hidden; /* 只显示当前“视口” */
+  
+}
