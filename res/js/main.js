@@ -248,6 +248,7 @@ ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
   }
 
   if(name==="cover_reply"){
+    console.log(payload)
     discoManager.setCover(payload?.cover ||"");
   }
 });

@@ -1,6 +1,6 @@
 // handlers/playback.js
 const path = require("path");
-const { extractTracksMetadata,extractCoverArt } = require("../metadata");
+const { extractTracksMetadata, extractCoverArt } = require("../metadata");
 
 /** UI 的模式到后端模式映射 */
 function mapUiModeToPlayMode(mode) {
@@ -32,13 +32,15 @@ function pickNextIndex(playMode, playlist, currentIndex, direction) {
     }
     return idx;
   }
-
-  // 默认：顺序循环
-  if (direction > 0) {
-    return (currentIndex + 1) % len;
-  } else if (direction < 0) {
-    return (currentIndex - 1 + len) % len;
+  else{
+    currentIndex;
   }
+  // 默认：顺序循环
+  // if (direction > 0) {
+  //   return (currentIndex + 1) % len;
+  // } else if (direction < 0) {
+  //   return (currentIndex - 1 + len) % len;
+  // }
   return currentIndex;
 }
 
@@ -117,6 +119,7 @@ async function handlePlayNext(_payload, ctx) {
   const ct = stateStore.get("current_track") || {};
   const currentIndex = typeof ct.index === "number" ? ct.index : -1;
   const playMode = stateStore.get("play_mode") || "single_loop";
+  console.log(ct,currentIndex,playMode);
 
   const nextIndex = pickNextIndex(playMode, playlist, currentIndex, +1);
   if (nextIndex === -1) return;
@@ -241,7 +244,7 @@ async function handleLike(_payload, ctx) {
 async function handleCoverrequest(_payload, ctx) {
   const {stateStore,storage, eventBus} = ctx;
   eventBus.emit("cover_reply", {
-    current: stateStore.state.current_track.cover,
+    cover: stateStore.state.current_track.cover,
   });
 }
 

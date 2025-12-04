@@ -19,7 +19,7 @@ class StateStore {
         // ⭐ 新增：点击次数（持久）
         likedCount: 0,
         is_playing: false,
-        cover: null,
+        cover: "",
       },
 
       play_mode: "single_loop",
@@ -58,8 +58,6 @@ class StateStore {
       index: typeof t.index === "number" ? t.index : i,
       path: t.path,
       likedCount: typeof t.likedCount === "number" ? t.likedCount : 0, // ⭐
-      is_playing: typeof t.is_playing === "boolean" ? t.is_playing : false,
-      cover: typeof t.cover === "string" ? t.cover : "",
     }));
   }
 
@@ -70,8 +68,6 @@ class StateStore {
       index: base + i,
       path: t.path,
       likedCount: typeof t.likedCount === "number" ? t.likedCount : 0, // ⭐
-      is_playing: typeof t.is_playing === "boolean" ? t.is_playing : false,
-      cover: typeof t.cover === "string" ? t.cover : "",
     }));
     this.state.playlist = this.state.playlist.concat(appended);
   }
@@ -120,6 +116,7 @@ class StateStore {
 
       likedCount: typeof track.likedCount === "number" ? track.likedCount : 0,
       is_playing: typeof track.is_playing === "boolean" ? track.is_playing : false,
+      cover: typeof track.cover === "string" ? track.cover:"",
     };
   }
 

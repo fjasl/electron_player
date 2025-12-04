@@ -66,24 +66,84 @@ async function extractTracksMetadata(filePaths) {
   return result;
 }
 
+// async function extractCoverArt(filePath) {
+//   try {
+//     // 使用 music-metadata 解析文件，只请求图片信息可以稍微提高效率
+//     const metadata = await mm.parseFile(filePath, {
+//       duration: false,
+//       skipCovers: false,
+//     });
+//     const common = metadata.common || {};
+
+//     if (common.picture && common.picture.length > 0) {
+//       const picture = common.picture[0];
+//       return bufferToBase64DataURI(picture.data, picture.format);
+//     }
+//   } catch (e) {
+//     console.warn("[metadata] cover art parse fail:", filePath, e.message);
+//   }
+//   return null;
+// }
 async function extractCoverArt(filePath) {
   try {
-    // 使用 music-metadata 解析文件，只请求图片信息可以稍微提高效率
     const metadata = await mm.parseFile(filePath, {
       duration: false,
       skipCovers: false,
     });
-    const common = metadata.common || {};
-
-    if (common.picture && common.picture.length > 0) {
-      const picture = common.picture[0];
-      return bufferToBase64DataURI(picture.data, picture.format);
+    
+    const picture = metadata.common?.picture?.[0];
+    if (!picture) {
+      console.log("[metadata] No picture found in:", filePath);
+      return null;
     }
+    
+    console.log("[metadata] Picture data type:", typeof picture.data);
+    console.log("[metadata] Picture data constructor:", picture.data?.constructor?.name);
+    console.log("[metadata] Picture format:", picture.format);
+    
+    // 转换数据为 Buffer
+    let imageBuffer;
+    if (Buffer.isBuffer(picture.data)) {
+      imageBuffer = picture.data;
+      console.log("[metadata] Data is already a Buffer, length:", imageBuffer.length);
+    } else if (picture.data) {
+      imageBuffer = Buffer.from(picture.data);
+      console.log("[metadata] Converted to Buffer, length:", imageBuffer.length);
+    } else {
+      console.log("[metadata] No data in picture");
+      return null;
+    }
+    
+    // 检查前几个字节
+    if (imageBuffer.length > 0) {
+      console.log("[metadata] First few bytes:", 
+        Array.from(imageBuffer.slice(0, 10)).join(','));
+    }
+    
+    // 获取 MIME 类型
+    let mimeType = picture.format || 'image/jpeg';
+    if (!mimeType.includes('/')) {
+      mimeType = `image/${mimeType}`;
+    }
+    
+    // 生成 base64
+    const base64 = imageBuffer.toString('base64');
+    console.log("[metadata] Base64 preview (first 50 chars):", base64.substring(0, 50));
+    
+    const dataURI = `data:${mimeType};base64,${base64}`;
+    
+    // 验证 data URI 格式
+    console.log("[metadata] Data URI preview (first 80 chars):", dataURI.substring(0, 80));
+    
+    return dataURI;
   } catch (e) {
     console.warn("[metadata] cover art parse fail:", filePath, e.message);
+    return null;
   }
-  return null;
 }
+
+
 module.exports = {
   extractTracksMetadata,
+  extractCoverArt
 };
