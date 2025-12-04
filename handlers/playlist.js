@@ -13,7 +13,7 @@ function makeTrackId(base, idx) {
  */
 async function handleOpenFiles(_payload, ctx) {
   const { stateStore, storage, eventBus } = ctx;
-
+  console.log(stateStore);
   const ret = await dialog.showOpenDialog({
     title: "选择音乐文件",
     properties: ["openFile", "multiSelections"],

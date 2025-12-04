@@ -18,6 +18,7 @@ class StateStore {
 
         // ⭐ 新增：点击次数（持久）
         likedCount: 0,
+        is_playing: false,
       },
 
       play_mode: "single_loop",
@@ -35,10 +36,18 @@ class StateStore {
 
   // ========== 通用接口 ==========
 
-  getState() { return this.state; }
-  get(k) { return this.state[k]; }
-  set(k, v) { this.state[k] = v; }
-  patch(partial) { this.state = { ...this.state, ...partial }; }
+  getState() {
+    return this.state;
+  }
+  get(k) {
+    return this.state[k];
+  }
+  set(k, v) {
+    this.state[k] = v;
+  }
+  patch(partial) {
+    this.state = { ...this.state, ...partial };
+  }
 
   // ========== playlist ==========
 
@@ -48,6 +57,7 @@ class StateStore {
       index: typeof t.index === "number" ? t.index : i,
       path: t.path,
       likedCount: typeof t.likedCount === "number" ? t.likedCount : 0, // ⭐
+      is_playing: typeof t.is_playing === "boolean" ? t.is_playing : false,
     }));
   }
 
@@ -58,6 +68,7 @@ class StateStore {
       index: base + i,
       path: t.path,
       likedCount: typeof t.likedCount === "number" ? t.likedCount : 0, // ⭐
+      is_playing: typeof t.is_playing === "boolean" ? t.is_playing : false,
     }));
     this.state.playlist = this.state.playlist.concat(appended);
   }
@@ -81,10 +92,15 @@ class StateStore {
   setCurrentTrackFromTrack(track) {
     if (!track) {
       this.state.current_track = {
-        id: null, index: -1, path: null,
-        position: 0, duration: 0,
-        title: null, artist: null,
+        id: null,
+        index: -1,
+        path: null,
+        position: 0,
+        duration: 0,
+        title: null,
+        artist: null,
         likedCount: 0,
+        is_playing: false,
       };
       return;
     }
@@ -99,6 +115,7 @@ class StateStore {
       artist: track.artist || null,
 
       likedCount: typeof track.likedCount === "number" ? track.likedCount : 0,
+      is_playing: typeof track.is_playing === "boolean" ? track.is_playing : false,
     };
   }
 
@@ -109,6 +126,9 @@ class StateStore {
   setPlayMode(mode) {
     if (mode === "single_loop" || mode === "shuffle")
       this.state.play_mode = mode;
+  }
+  setPlaying(isPlaying) {
+    this.state.current_track.is_playing = isPlaying;
   }
 
   /** ⭐ 当前曲目的 likedCount +1（同时更新playlist） */
@@ -138,8 +158,7 @@ class StateStore {
     if (!loaded || typeof loaded !== "object") return;
 
     // playlist
-    if (Array.isArray(loaded.playlist))
-      this.setPlaylist(loaded.playlist);
+    if (Array.isArray(loaded.playlist)) this.setPlaylist(loaded.playlist);
 
     // current_track
     if (loaded.current_track) {
@@ -152,7 +171,8 @@ class StateStore {
         duration: ct.duration ?? 0,
         title: ct.title ?? null,
         artist: ct.artist ?? null,
-        likedCount: ct.likedCount ?? 0,   // ⭐
+        likedCount: ct.likedCount ?? 0, // ⭐
+        is_playing: typeof ct.is_playing === "boolean" ? ct.is_playing : false,
       };
     }
 
@@ -160,8 +180,7 @@ class StateStore {
     if (loaded.play_mode) this.setPlayMode(loaded.play_mode);
 
     // last_session
-    if (loaded.last_session)
-      this.state.last_session = loaded.last_session;
+    if (loaded.last_session) this.state.last_session = loaded.last_session;
 
     // settings
     if (loaded.settings) this.state.settings = loaded.settings;

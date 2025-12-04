@@ -23,11 +23,37 @@ const listUI = new ListUIController();
 // 维护：列表项 id -> 后端 playlist.index 的映射
 let idToIndexMap = new Map();
 
-// ============== 播放界面 → 后端意图 ==============
+// 音频管理器（对应 index.html 里的 <audio id="player_audio">）
+const audioManager = new AudioManager("player_audio");
 
-playUI.callbacks.onPlayToggle = (isPlaying) => {
-  console.log("[frontend] 播放状态切换：", isPlaying);
-  sendIntent("play_toggle", { is_playing: isPlaying });
+// 记录当前 audio 正在播放的那一首（用后端的 track.id）
+let currentAudioTrackId = null;
+
+// ============== AudioManager → 后端 / UI ==============
+
+// audioManager.callbacks.onPlayStateChange = (isPlaying) => {
+//   console.log("[frontend] audio play state:", isPlaying);
+//   playUI.setPlayState(isPlaying);
+//   sendIntent("play_toggle", { is_playing: isPlaying });
+// };
+
+audioManager.callbacks.onProgress = (position, duration) => {
+  playUI.setProgress(position, duration);
+
+};
+
+audioManager.callbacks.onEnded = () => {
+  console.log("[frontend] audio ended → play_next");
+  sendIntent("play_next", {});
+};
+
+// ============== 播放界面 → AudioManager / 后端意图 ==============
+
+// 播放/暂停：只控制 <audio>，后端通过 audio 事件感知
+playUI.callbacks.onPlayToggle = () => {
+  console.log("[frontend] 播放按钮切换：", );
+  // audioManager.setPlaying(isPlaying);
+  sendIntent("play_toggle", {});
 };
 
 playUI.callbacks.onNext = () => {
@@ -40,9 +66,10 @@ playUI.callbacks.onPrev = () => {
   sendIntent("play_prev", {});
 };
 
+// 喜欢：前端只发一次“like”意图，具体次数累计在后端控制
 playUI.callbacks.onLikeToggle = () => {
   console.log("[frontend] like了一次");
-  sendIntent("like", {  });
+  sendIntent("like", {});
 };
 
 playUI.callbacks.onModeChange = (mode) => {
@@ -52,6 +79,9 @@ playUI.callbacks.onModeChange = (mode) => {
 
 playUI.callbacks.onSeek = (percent) => {
   console.log("[frontend] 跳转进度：", percent);
+  // 1）先让 audio 跳转
+  audioManager.seekToPercent(percent);
+  // 2）立刻告诉后端（不用等 timeupdate）
   sendIntent("seek", { percent });
 };
 
@@ -82,18 +112,18 @@ listUI.callbacks.onItemAdded = (item) => {
   console.log("[frontend] 添加列表项：", item.id, item.titleText);
 };
 
-
-listUI.callbacks.onItemRemoved = (item) => {
-  console.log("[frontend] 删除列表项：", item.id, item.titleText);
-  const idx = idToIndexMap.get(item.id);
+// 删除歌曲：转成 index 给后端
+listUI.callbacks.onItemRemoved = (id) => {
+  console.log("[frontend] 删除列表项：", id);
+  const idx = idToIndexMap.get(id);
   if (typeof idx === "number") {
     sendIntent("del_list_track", { index: idx });
   } else {
-    console.warn("[frontend] 删除时找不到 index，对应 id:", item.id);
+    console.warn("[frontend] 删除时找不到 index，对应 id:", id);
   }
 };
 
-// 点击“选择文件夹 / 文件” → open_files
+// 点击“选择文件” → open_files
 listUI.callbacks.onFilePickClick = () => {
   console.log("[frontend] 点击选择文件按钮 → intent: open_files");
   sendIntent("open_files", {});
@@ -157,17 +187,19 @@ function highlightCurrentTrack(current) {
 ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
   console.log("[frontend] backend-event:", name, payload);
 
+  // 播放列表变更
   if (name === "playlist_changed") {
     const playlist = payload?.playlist || [];
     rebuildListFromPlaylist(playlist);
     return;
   }
 
+  // 当前曲目变更（切歌 / 启动恢复 / seek / like 之后的状态）
   if (name === "current_track_changed") {
     const current = payload?.current;
     if (!current) return;
 
-    const title = current.title || titleFromPath(current.path);
+    const title = current.title || "";
     const artist = current.artist || "";
     const position = current.position || 0;
     const duration = current.duration || 0;
@@ -176,24 +208,36 @@ ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
     playUI.setSongInfo(title, artist);
     playUI.setProgress(position, duration);
 
-    // 收藏状态
-
+    // 每次切到新歌，都重置“本次播放是否已经点过喜欢”
+    //（真正的 likedCount 在后端的 state 中维护）
     playUI.setLiked(false);
+
+    // 如果是“首切到这首歌”（或启动恢复的那首），并且 path 有效 → 让 Audio 播放
+    if (current.id && current.path && current.id !== currentAudioTrackId) {
+        console.log("[frontend] loadAndPlay:", current.path, "from", position);
+        audioManager.load(current.path, position || 0);
+        currentAudioTrackId = current.id;
+      console.log("[frontend] load:", current.path, "from", position);
+     }
 
     // 高亮列表当前项
     highlightCurrentTrack(current);
     return;
   }
 
+  // 播放状态来自后端（主要是同步给 UI，真正驱动的是 <audio>）
   if (name === "play_state_changed") {
-    const isPlaying = !!payload?.is_playing;
+    const isPlaying = payload?.is_playing;
+    console.log("[event:play_state_changed] isPlaying =", isPlaying);
     playUI.setPlayState(isPlaying);
+    audioManager.setPlaying(isPlaying);
+    audioManager.reportProgress(isPlaying);
     return;
   }
 
+  // 播放模式改变（single_loop / shuffle → UI 的 one / shuffle）
   if (name === "play_mode_changed") {
     const backendMode = payload?.play_mode || "single_loop";
-    // 简单映射：shuffle -> shuffle，其余先都视为单曲循环 one
     const uiMode = backendMode === "shuffle" ? "shuffle" : "one";
     playUI.setMode(uiMode);
     return;

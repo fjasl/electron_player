@@ -16,6 +16,7 @@ function initBackend(win) {
   if (loadedState) {
     console.log("[BackendInit] loaded app_state.json");
     stateStore.hydrateFromStorage(loadedState);
+    stateStore.state.current_track.is_playing = false;
   } else {
     console.log("[BackendInit] no existing state file, using defaults");
   }

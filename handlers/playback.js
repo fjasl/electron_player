@@ -89,11 +89,15 @@ async function switchToIndex(index, ctx) {
   eventBus.emit("current_track_changed", {
     current: stateStore.get("current_track"),
   });
+  eventBus.emit("play_state_changed", {
+    is_playing: true,
+  });
 }
 
 /** 双击列表播放 / 选择列表某首歌 */
 async function handlePlayListTrack(payload, ctx) {
   const { index } = payload || {};
+
   if (typeof index !== "number" || index < 0) {
     console.warn("[play_list_track] invalid index:", index);
     return;
@@ -135,16 +139,17 @@ async function handlePlayPrev(_payload, ctx) {
 
 /** 播放/暂停 */
 async function handlePlayToggle(payload, ctx) {
-  const { stateStore, storage, eventBus } = ctx;
-  const isPlaying = !!(payload && payload.is_playing);
 
-  stateStore.setPlaying(isPlaying);
+  const { stateStore, storage, eventBus } = ctx;
+  stateStore.setPlaying(!stateStore.state.current_track.is_playing);
+  
   stateStore.snapshotLastSession();
   storage.saveState(stateStore.getState());
 
   eventBus.emit("play_state_changed", {
-    is_playing: stateStore.get("is_playing"),
+    is_playing: stateStore.state.current_track.is_playing,
   });
+  console.log("[handPlayToggle]:"+stateStore.state.current_track.is_playing)
 }
 
 /** 设置播放模式（来自 UI 的 loop/one/shuffle） */
@@ -186,7 +191,32 @@ async function handleSeek(payload, ctx) {
   });
 }
 
-/** 收藏/取消收藏 当前曲目 */
+/** 跳转进度（percent: 0~1） */
+async function handlePositionReport(payload, ctx) {
+  const { stateStore, storage, eventBus } = ctx;
+  const position = payload?.position;
+  if (typeof position !== "number") return;
+
+  const ct = stateStore.get("current_track");
+  const duration = ct.duration || 0;
+  let newPos = 0;
+  if (duration > 0) {
+    newPos = position;
+  }
+
+  stateStore.updateCurrentPosition(newPos);
+  stateStore.snapshotLastSession();
+  storage.saveState(stateStore.getState());
+
+  // 仍然复用 current_track_changed，把 position 带出去
+  eventBus.emit("position_changed", {
+    current: stateStore.get("current_track"),
+  });
+  console.log("[handlePositionReport]:"+stateStore.state.current_track.position);
+}
+
+
+/** like曲目 当前曲目 */
 async function handleLike(_payload, ctx) {
   const { stateStore, storage, eventBus } = ctx;
 
@@ -214,6 +244,7 @@ function registerPlaybackHandlers(stateMachine) {
   stateMachine.registerHandler("play_toggle", handlePlayToggle);
   stateMachine.registerHandler("set_play_mode", handleSetPlayMode);
   stateMachine.registerHandler("seek", handleSeek);
+  stateMachine.registerHandler("position_report", handlePositionReport);
   stateMachine.registerHandler("like", handleLike);
 }
 

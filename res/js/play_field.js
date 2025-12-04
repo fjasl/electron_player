@@ -53,8 +53,8 @@ class PlayUIController {
   bindEvents() {
     // 播放/暂停
     this.dom.btnPlay.addEventListener("click", () => {
-      this.togglePlayUI();
-      this.callbacks.onPlayToggle?.(this.isPlaying);
+      // this.togglePlayUI();
+      this.callbacks.onPlayToggle?.();
     });
 
     // 下一曲
