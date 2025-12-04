@@ -3,11 +3,11 @@ const path = require("path");
 const { extractTracksMetadata, extractCoverArt } = require("../metadata");
 
 /** UI 的模式到后端模式映射 */
-function mapUiModeToPlayMode(mode) {
-  if (mode === "shuffle") return "shuffle";
-  // 目前后端只区分 single_loop / shuffle
-  return "single_loop";
-}
+// function mapUiModeToPlayMode(mode) {
+//   if (mode === "shuffle") return "shuffle";
+//   // 目前后端只区分 single_loop / shuffle
+//   return "single_loop";
+// }
 
 /** 根据播放模式和方向，计算下一首的 index */
 function pickNextIndex(playMode, playlist, currentIndex, direction) {
@@ -155,22 +155,29 @@ async function handlePlayToggle(payload, ctx) {
   eventBus.emit("play_state_changed", {
     is_playing: stateStore.state.current_track.is_playing,
   });
-  console.log("[handPlayToggle]:"+stateStore.state.current_track.is_playing)
+
 }
 
 /** 设置播放模式（来自 UI 的 loop/one/shuffle） */
 async function handleSetPlayMode(payload, ctx) {
   const { stateStore, storage, eventBus } = ctx;
-  const uiMode = payload?.mode;
-  if (!uiMode) return;
+  if(stateStore.state.play_mode ==="single_loop")
+  {
+    stateStore.state.play_mode ="shuffle";
+  }
+  else{
+    stateStore.state.play_mode ="single_loop";
+  }
 
-  const backendMode = mapUiModeToPlayMode(uiMode);
-  stateStore.setPlayMode(backendMode);
+
+
+  console.log(stateStore.state.play_mode)
+  // stateStore.setPlayMode(currentMode);
   stateStore.snapshotLastSession();
   storage.saveState(stateStore.getState());
 
   eventBus.emit("play_mode_changed", {
-    play_mode: backendMode,
+    play_mode: stateStore.state.play_mode,
   });
 }
 

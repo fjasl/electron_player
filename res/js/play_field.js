@@ -131,7 +131,7 @@ class PlayUIController {
   /** 设置播放模式（loop | one | shuffle） */
   setMode(mode) {
     this.playMode = mode;
-    this.updateModeUI();
+    this.updateModeUI(mode);
   }
 
   /** 更新封面图片 */
@@ -167,16 +167,17 @@ class PlayUIController {
   }
 
   switchPlayMode() {
-    const modes = ["loop", "one", "shuffle"];
+    const modes = ["shuffle", "shuffle"];
     let index = modes.indexOf(this.playMode);
     this.playMode = modes[(index + 1) % modes.length];
     this.updateModeUI();
   }
 
-  updateModeUI() {
+  updateModeUI(mode) {
+
     const icon = this.dom.btnPlayMode.querySelector("i");
-    if (this.playMode === "one") icon.className = "fa-solid fa-repeat";
-    else if (this.playMode === "shuffle")
+    if (mode === "single_loop") icon.className = "fa-solid fa-repeat";
+    else if (mode === "shuffle")
       icon.className = "fa-solid fa-shuffle";
   }
 

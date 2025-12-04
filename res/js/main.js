@@ -75,8 +75,8 @@ playUI.callbacks.onLikeToggle = () => {
 };
 
 playUI.callbacks.onModeChange = (mode) => {
-  console.log("[frontend] 播放模式：", mode); // loop | one | shuffle
-  sendIntent("set_play_mode", { mode });
+  console.log("[frontend] 播放模式："); // loop | one | shuffle
+  sendIntent("set_play_mode", {});
 };
 
 playUI.callbacks.onSeek = (percent) => {
@@ -241,9 +241,8 @@ ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
 
   // 播放模式改变（single_loop / shuffle → UI 的 one / shuffle）
   if (name === "play_mode_changed") {
-    const backendMode = payload?.play_mode || "single_loop";
-    const uiMode = backendMode === "shuffle" ? "shuffle" : "one";
-    playUI.setMode(uiMode);
+    const backendMode = payload?.play_mode;
+    playUI.setMode(backendMode);
     return;
   }
 

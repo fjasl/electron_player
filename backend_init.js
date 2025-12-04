@@ -35,24 +35,24 @@ function initBackend(win) {
 
   // 4. 等渲染进程加载完成后，再把当前状态同步给前端
   win.webContents.on("did-finish-load", () => {
-    console.log("[BackendInit] did-finish-load, sync initial state to renderer");
+    // console.log("[BackendInit] did-finish-load, sync initial state to renderer");
 
     // 4.1 playlist 自动加载
     const playlistState = stateStore.get("playlist") || [];
     if (playlistState.length > 0) {
-      console.log(
-        "[BackendInit] emit playlist_changed on startup, len =",
-        playlistState.length
-      );
+      // console.log(
+      //   "[BackendInit] emit playlist_changed on startup, len =",
+      //   playlistState.length
+      // );
       eventBus.emit("playlist_changed", { playlist: playlistState });
     } else {
-      console.log("[BackendInit] playlist is empty on startup");
+      // console.log("[BackendInit] playlist is empty on startup");
     }
 
     // 4.2 如果已经有 current_track，也同步给前端
     const ct = stateStore.get("current_track");
     if (ct && ct.id) {
-      console.log("[BackendInit] emit current_track_changed on startup");
+      // console.log("[BackendInit] emit current_track_changed on startup");
       eventBus.emit("current_track_changed", { current: ct });
     }
   });
