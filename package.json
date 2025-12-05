@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "electron": "^39.2.4",
     "music-metadata": "^11.10.3"
   },
   "name": "player",
@@ -9,12 +8,31 @@
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder"
   },
   "keywords": [],
   "author": "",
   "devDependencies": {
+    "electron": "^39.2.4",
     "electron-builder": "^24.0.0"
+  },
+  "build": {
+    "appId": "com.yun.app",
+    "productName": "yun_player",
+    "files": [
+      "**/*",
+      "!app_state.json",
+      "!.gitignore"
+    ],
+    "directories": {
+      "output": "dist" 
+    },
+    "win": {
+      "target": "nsis", 
+      "icon": "icon.png" 
+    }
+    
   },
   "license": "ISC"
 }

@@ -26,7 +26,7 @@ function createWindow() {
   win.loadFile(path.join(__dirname, "index.html"));
 
   // 方便你看整个链路
-  win.webContents.openDevTools({ mode: "detach" });
+  //win.webContents.openDevTools({ mode: "detach" });
 }
 
 function createTray() {
@@ -46,6 +46,24 @@ function createTray() {
           win.show();
         }
       },
+    },
+    {
+      type: "separator",
+    },
+    {
+      label: "开发者工具", // 添加新的菜单项
+      click: () => {
+        if (win.webContents.isDevToolsOpened()) {
+          // 如果已经打开了，就关闭它
+          win.webContents.closeDevTools();
+        } else {
+          // 如果是关闭状态，就以 'detach' 模式打开
+          win.webContents.openDevTools({ mode: "detach" });
+        }
+      },
+    },
+    {
+      type: "separator",
     },
     {
       label: "联系作者",
@@ -84,7 +102,7 @@ app.whenReady().then(() => {
 //   app.quit();
 // });
 
-app.on('will-quit', () => {
+app.on("will-quit", () => {
   console.log("应用即将退出，正在保存状态...");
   if (stateStoreInstance) {
     storage.saveState(stateStoreInstance.getState());
