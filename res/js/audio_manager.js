@@ -34,6 +34,7 @@ class AudioManager {
     this.audio.addEventListener("timeupdate", () => {
       const position = this.audio.currentTime || 0;
       const duration = this.audio.duration || 0;
+      sendIntent("position_report", { position });
       this.callbacks.onProgress?.(position, duration);
     });
 

@@ -23,6 +23,7 @@ class ListUIController {
       // 这里的 onItemRemoved = 用户点击删除按钮（删除请求）
       onItemRemoved: null, // (itemData)
       onFilePickClick: null, // 点左侧文件夹按钮
+      onFindBtnClick: null, //点击寻找按钮后回调
       onFilterChange: null, // 搜索关键字变化 (keyword)
     };
 
@@ -94,9 +95,11 @@ class ListUIController {
       this.callbacks.onItemSelect?.(itemData);
     });
 
-    this.findBtn.addEventListener("click",()=>{
+    this.findBtn.addEventListener("click", () => {
+      this.callbacks.onFindBtnClick?.(this.items);
+      this.setCurrentItem(this.currentId);
       this.scrollToCurrentItem();
-    })
+    });
 
     // 双击：播放
     el.addEventListener("dblclick", (e) => {
@@ -245,6 +248,7 @@ class ListUIController {
       this._removeSearchRow();
     } else {
       this._createSearchRow();
+      this.scrollToCurrentItem("find_item");
     }
   }
 
@@ -254,6 +258,7 @@ class ListUIController {
 
     const el = document.createElement("div");
     el.className = "list_item list_item--enter list_item--search";
+    el.id ="find_item";
 
     el.innerHTML = `
       <div class="list_item_info">

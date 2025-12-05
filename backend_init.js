@@ -55,6 +55,12 @@ function initBackend(win) {
       // console.log("[BackendInit] emit current_track_changed on startup");
       eventBus.emit("current_track_changed", { current: ct });
     }
+
+    if (stateStore && stateStore.state.play_mode) {
+      eventBus.emit("play_mode_changed", {
+        play_mode: stateStore.state.play_mode,
+      });
+    }
   });
   return stateStore;
 }

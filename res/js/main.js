@@ -1,6 +1,7 @@
 // res/js/main.js
 
 const { ipcRenderer } = require("electron");
+const { path } = require("path");
 
 // 发送意图到后端状态机
 function sendIntent(intent, payload = {}) {
@@ -30,6 +31,9 @@ const audioManager = new AudioManager("player_audio");
 // 记录当前 audio 正在播放的那一首（用后端的 track.id）
 let currentAudioTrackId = null;
 
+//记录路径
+let currentAudioPath = null;
+
 const discoManager = new DiscoManager();
 
 // ============== AudioManager → 后端 / UI ==============
@@ -42,7 +46,6 @@ const discoManager = new DiscoManager();
 
 audioManager.callbacks.onProgress = (position, duration) => {
   playUI.setProgress(position, duration);
-
 };
 
 audioManager.callbacks.onEnded = () => {
@@ -55,10 +58,10 @@ audioManager.callbacks.onEnded = () => {
 // 播放/暂停：只控制 <audio>，后端通过 audio 事件感知
 playUI.callbacks.onReturn = () => {
   tabController.switchTab("list");
-}
+};
 
 playUI.callbacks.onPlayToggle = () => {
-  console.log("[frontend] 播放按钮切换：", );
+  console.log("[frontend] 播放按钮切换：");
   // audioManager.setPlaying(isPlaying);
   sendIntent("play_toggle", {});
 };
@@ -136,6 +139,12 @@ listUI.callbacks.onFilePickClick = () => {
   console.log("[frontend] 点击选择文件按钮 → intent: open_files");
   sendIntent("open_files", {});
 };
+listUI.callbacks.onFindBtnClick = (item) => {
+  console.log("[fontend]: 定位按钮");
+  const fileName = titleFromPath(currentAudioPath);
+  const targetItem = item.find((item) => item.titleText === fileName);
+  listUI.currentId = targetItem.id;
+};
 
 // 搜索关键字变化（调试用）
 listUI.callbacks.onFilterChange = (kw) => {
@@ -211,6 +220,7 @@ ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
     const artist = current.artist || "";
     const position = current.position || 0;
     const duration = current.duration || 0;
+    currentAudioPath = current.path || "";
 
     // 更新播放界面歌曲信息 + 进度
     playUI.setSongInfo(title, artist);
@@ -222,12 +232,12 @@ ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
 
     // 如果是“首切到这首歌”（或启动恢复的那首），并且 path 有效 → 让 Audio 播放
     if (current.id && current.path && current.id !== currentAudioTrackId) {
-        console.log("[frontend] loadAndPlay:", current.path, "from", position);
-        audioManager.load(current.path, position || 0);
-        currentAudioTrackId = current.id;
-        sendIntent("cover_request", {});
+      console.log("[frontend] loadAndPlay:", current.path, "from", position);
+      audioManager.load(current.path, position || 0);
+      currentAudioTrackId = current.id;
+      sendIntent("cover_request", {});
       console.log("[frontend] load:", current.path, "from", position);
-     }
+    }
 
     // 高亮列表当前项
     highlightCurrentTrack(current);
@@ -240,7 +250,6 @@ ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
     // console.log("[event:play_state_changed] isPlaying =", isPlaying);
     playUI.setPlayState(isPlaying);
     audioManager.setPlaying(isPlaying);
-    audioManager.reportProgress(isPlaying);
     discoManager.toggleRotation(isPlaying);
     return;
   }
@@ -252,8 +261,8 @@ ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
     return;
   }
 
-  if(name==="cover_reply"){
-    console.log(payload)
-    discoManager.setCover(payload?.cover ||"");
+  if (name === "cover_reply") {
+    console.log(payload);
+    discoManager.setCover(payload?.cover || "");
   }
 });
