@@ -6,6 +6,7 @@ class ListUIController {
     this.filePickBtn = document.getElementById("file_pick_btn");
     this.locateBtn = document.getElementById("list_locate_btn");
     this.findBtn = document.getElementById("list_find_btn");
+    this.searchBar = null;
 
     this.nextId = 1;
     /** 真实歌曲项（不含搜索条） */
@@ -14,6 +15,8 @@ class ListUIController {
     this.searchRow = null;
     /** 当前选中的项 id（可选） */
     this.currentId = null;
+    //有无搜索条
+    this.isSearching = false;
 
     // 对接后端的回调
     this.callbacks = {
@@ -246,8 +249,11 @@ class ListUIController {
   toggleSearchRow() {
     if (this.searchRow) {
       this._removeSearchRow();
+      this.isSearching = false;
     } else {
+      this.isSearching = true;
       this._createSearchRow();
+      this.searchBar=document.getElementById("list_search_input");
       this.scrollToCurrentItem("find_item");
     }
   }

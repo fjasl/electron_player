@@ -114,6 +114,7 @@ listUI.callbacks.onItemPlay = (item) => {
   const idx = idToIndexMap.get(item.id);
   if (typeof idx === "number") {
     sendIntent("play_list_track", { index: idx });
+    tabController.switchTab("play");
   } else {
     console.warn("[frontend] 无法找到该 item 对应的 playlist.index");
   }
@@ -181,6 +182,13 @@ function rebuildListFromPlaylist(playlist) {
     // item 是 { id, el, titleText }
     idToIndexMap.set(item.id, track.index);
   });
+  
+  if(listUI.isSearching === true){
+    const kw = listUI.searchBar.value;
+    console.log("重建列表"+kw);
+    listUI.applyFilter(kw);
+  }
+
 }
 
 /** 根据 current_track 高亮列表里对应项 */
