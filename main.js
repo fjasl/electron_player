@@ -51,7 +51,7 @@ function createTray() {
       label: "联系作者",
       click: async () => {
         // 使用 shell 打开外部链接
-        const githubUrl = "github.com"; // 替换为您的联系方式链接
+        const githubUrl = "https://space.bilibili.com/636291411"; // 替换为您的联系方式链接
         await shell.openExternal(githubUrl);
       },
     },

@@ -33,7 +33,9 @@
 #progress_fill {
   position: absolute;
   inset: 0;
-  width: 0%; /* 先写死 30%，后面用 JS 改百分比 */
+  transform-origin: left; /* 确保是从左侧开始缩放 */
+  transform: scaleX(0); /* 初始缩放比例为 0 */
+  /*width: 0%;  先写死 30%，后面用 JS 改百分比 */
   background: linear-gradient(to right, #ffffff, rgba(255, 255, 255, 0.7));
   border-radius: inherit;
   transition: width 0.2s ease;
@@ -138,19 +140,18 @@
   pointer-events: none;
 
   /* 斜着的一块高光：上左亮，下右透明 */
-  background:
-    radial-gradient(
-      circle at 20% 0%,
-      rgba(255, 255, 255, 0.28) 0%,
-      rgba(255, 255, 255, 0.08) 22%,
-      rgba(0, 0, 0, 0) 60%
-    );
+  background: radial-gradient(
+    circle at 20% 0%,
+    rgba(255, 255, 255, 0.28) 0%,
+    rgba(255, 255, 255, 0.08) 22%,
+    rgba(0, 0, 0, 0) 60%
+  );
 
   /* 略微旋转一点，看起来像斜向反光 */
   transform: rotate(-20deg);
 
-  opacity: 0.9;        /* 整体强度，太亮就调小 */
-  mix-blend-mode: screen;  /* 让高光和下面的黑胶更自然融合，可选 */
+  opacity: 0.9; /* 整体强度，太亮就调小 */
+  mix-blend-mode: screen; /* 让高光和下面的黑胶更自然融合，可选 */
 }
 #disco::after {
   content: "";
@@ -160,19 +161,18 @@
   pointer-events: none;
 
   /* 斜着的一块高光：上左亮，下右透明 */
-  background:
-    radial-gradient(
-      circle at 20% 0%,
-      rgba(255, 255, 255, 0.28) 0%,
-      rgba(255, 255, 255, 0.08) 22%,
-      rgba(0, 0, 0, 0) 60%
-    );
+  background: radial-gradient(
+    circle at 20% 0%,
+    rgba(255, 255, 255, 0.28) 0%,
+    rgba(255, 255, 255, 0.08) 22%,
+    rgba(0, 0, 0, 0) 60%
+  );
 
   /* 略微旋转一点，看起来像斜向反光 */
   transform: rotate(160deg);
 
-  opacity: 0.9;        /* 整体强度，太亮就调小 */
-  mix-blend-mode: screen;  /* 让高光和下面的黑胶更自然融合，可选 */
+  opacity: 0.9; /* 整体强度，太亮就调小 */
+  mix-blend-mode: screen; /* 让高光和下面的黑胶更自然融合，可选 */
 }
 
 #disco_cover {

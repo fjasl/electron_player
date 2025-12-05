@@ -34,6 +34,10 @@ class PlayUIController {
     this.isLiked = false;
     this.playMode = "one"; // loop | one | shuffle
 
+    //节流
+    this.lastDomUpdateTime = 0;
+    this.UI_UPDATE_INTERVAL = 500;
+
     // 回调接口（让后端 / 播放核心接管）
     this.callbacks = {
       onReturn: null,
@@ -122,9 +126,14 @@ class PlayUIController {
 
   /** 更新进度条（后端定时调用） */
   setProgress(position, duration) {
+    
+
+
     this.dom.posLabel.textContent = this.formatTime(position);
     this.dom.durationLabel.textContent = this.formatTime(duration);
-    this.dom.fill.style.width = (position / duration) * 100 + "%";
+    //this.dom.fill.style.width = (position / duration) * 100 + "%";
+    const scaleFactor = position / duration;
+    this.dom.fill.style.transform = `scaleX(${scaleFactor})`;
   }
 
   /** 设置是否为喜欢状态 */
