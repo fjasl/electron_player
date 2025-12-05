@@ -4,7 +4,7 @@
         background-color: rgba(255, 255, 255, 0.12);
         border-radius: 24px;
         /* backdrop-filter: blur(16px); */
-        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.7);
+        /* box-shadow: 0 18px 40px rgba(15, 23, 42, 0.7); */
         padding: 16px;
         color: #111827;
         -webkit-app-region: drag;

@@ -1,7 +1,6 @@
 // res/js/main.js
 
 const { ipcRenderer } = require("electron");
-const { path } = require("path");
 
 // 发送意图到后端状态机
 function sendIntent(intent, payload = {}) {
@@ -35,6 +34,8 @@ let currentAudioTrackId = null;
 let currentAudioPath = null;
 
 const discoManager = new DiscoManager();
+
+const mediaControl = new MediaControl();
 
 // ============== AudioManager → 后端 / UI ==============
 
@@ -199,7 +200,25 @@ function highlightCurrentTrack(current) {
     listUI.setCurrentItem(targetId);
   }
 }
-
+// ============== 系统媒体控件 ==============
+mediaControl.callbacks.onPlay = () => {
+  console.log("[frontend] 播放按钮切换：");
+  // audioManager.setPlaying(isPlaying);
+  sendIntent("play_toggle", {});
+};
+mediaControl.callbacks.onPause = () => {
+  console.log("[frontend] 播放按钮切换：");
+  // audioManager.setPlaying(isPlaying);
+  sendIntent("play_toggle", {});
+};
+mediaControl.callbacks.onNext = () => {
+  console.log("[frontend] 下一曲");
+  sendIntent("play_next", {});
+};
+mediaControl.callbacks.onPrev = () => {
+  console.log("[frontend] 上一曲");
+  sendIntent("play_prev", {});
+};
 // 监听后端 EventBus 发来的事件
 ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
   // console.log("[frontend] backend-event:", name, payload);
@@ -221,6 +240,11 @@ ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
     const position = current.position || 0;
     const duration = current.duration || 0;
     currentAudioPath = current.path || "";
+
+    console.log(current);
+    // mediaControl.updateMetadata(current);
+    mediaControl.updateTitle(current.title);
+    mediaControl.updateArtist(current.artist);
 
     // 更新播放界面歌曲信息 + 进度
     playUI.setSongInfo(title, artist);
@@ -262,7 +286,7 @@ ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
   }
 
   if (name === "cover_reply") {
-    console.log(payload);
     discoManager.setCover(payload?.cover || "");
+    mediaControl.updateArtwork(payload?.cover);
   }
 });

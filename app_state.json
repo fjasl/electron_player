@@ -4,7 +4,7 @@
       "id": "t_miruirh0_1",
       "index": 0,
       "path": "D:\\songs\\春庭雪.mp3",
-      "likedCount": 0
+      "likedCount": 1
     },
     {
       "id": "t_miruirh0_3",
@@ -40,7 +40,7 @@
       "id": "t_miruirh0_8",
       "index": 6,
       "path": "D:\\songs\\记念.mp3",
-      "likedCount": 0
+      "likedCount": 1
     },
     {
       "id": "t_miruirh0_9",
@@ -82,14 +82,14 @@
       "id": "t_misku7jr_0",
       "index": 13,
       "path": "D:\\songs\\nevada.mp3",
-      "likedCount": 0
+      "likedCount": 2
     }
   ],
   "current_track": {
     "id": "t_misku7jr_0",
     "index": 13,
     "path": "D:\\songs\\nevada.mp3",
-    "position": 188.092593,
+    "position": 2.086327,
     "duration": 208.58775510204083,
     "title": "Nevada",
     "artist": "Vicetone",
@@ -101,7 +101,7 @@
   "last_session": {
     "id": "t_misku7jr_0",
     "path": "D:\\songs\\nevada.mp3",
-    "position": 188.092593,
+    "position": 2.086327,
     "play_mode": "shuffle"
   },
   "settings": {}
