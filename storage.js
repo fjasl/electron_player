@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 
 // 整个应用状态存这里
-const STATE_FILE = path.join(__dirname, "app_state.json");
+const STATE_FILE = path.join(process.cwd(), "app_state.json");
 
 class Storage {
   /**
