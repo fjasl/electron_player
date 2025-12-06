@@ -5,7 +5,10 @@ class StateStore {
     this.state = {
       // 播放列表：TrackModel = { id, index, path, likedCount }
       playlist: [],
-
+      Lyric:{
+        LyricList:[],
+        currentLyricRow:0,
+      },
       // 当前曲目（附带更多元数据）
       current_track: {
         id: null,
@@ -20,6 +23,7 @@ class StateStore {
         likedCount: 0,
         is_playing: false,
         cover: "",
+        lyric_bind:"",
       },
 
       play_mode: "single_loop",
@@ -58,6 +62,7 @@ class StateStore {
       index: typeof t.index === "number" ? t.index : i,
       path: t.path,
       likedCount: typeof t.likedCount === "number" ? t.likedCount : 0, // ⭐
+      lyric_bind: typeof t.lyric_bind === "string" ? t.lyric_bind : "",
     }));
   }
 
@@ -68,6 +73,7 @@ class StateStore {
       index: base + i,
       path: t.path,
       likedCount: typeof t.likedCount === "number" ? t.likedCount : 0, // ⭐
+      lyric_bind: typeof t.lyric_bind === "string" ? t.lyric_bind : "",
     }));
     this.state.playlist = this.state.playlist.concat(appended);
   }
@@ -101,6 +107,7 @@ class StateStore {
         likedCount: 0,
         is_playing: false,
         cover: "",
+        lyric_bind:"",
       };
       return;
     }
@@ -117,6 +124,7 @@ class StateStore {
       likedCount: typeof track.likedCount === "number" ? track.likedCount : 0,
       is_playing: typeof track.is_playing === "boolean" ? track.is_playing : false,
       cover: typeof track.cover === "string" ? track.cover:"",
+      lyric_bind:typeof track.lyric_bind ==="string" ? track.lyric_bind: "",
     };
   }
 
@@ -150,6 +158,7 @@ class StateStore {
       path: ct.path,
       position: ct.position,
       play_mode: this.state.play_mode,
+      lyric_bind:ct.lyric_bind,
     };
   }
 
@@ -175,6 +184,7 @@ class StateStore {
         likedCount: ct.likedCount ?? 0, // ⭐
         is_playing: typeof ct.is_playing === "boolean" ? ct.is_playing : false,
         cover: typeof ct.cover === "string" ? ct.cover : "",
+        lyric_bind:typeof ct.lyric_bind === "string" ? ct.lyric_bind:"",
       };
     }
 

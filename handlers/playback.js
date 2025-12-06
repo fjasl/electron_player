@@ -1,6 +1,8 @@
 // handlers/playback.js
 const path = require("path");
+const LrcParser = require("./lyric.js");
 const { extractTracksMetadata, extractCoverArt } = require("../metadata");
+const { listenerCount, emit } = require("process");
 
 /** UI 的模式到后端模式映射 */
 // function mapUiModeToPlayMode(mode) {
@@ -59,6 +61,7 @@ async function switchToIndex(index, ctx) {
   let artist = null;
   let duration = 0;
   let cover = "";
+ 
 
   try {
     const metas = await extractTracksMetadata([track.path]);
@@ -84,8 +87,11 @@ async function switchToIndex(index, ctx) {
     duration,
     liked: !!currentLiked,
     cover,
+    lyric_bind : track.lyric_bind,
   });
-
+  stateStore.state.Lyric.LyricList=await LrcParser.loadAndParseLrcFile(track.lyric_bind);
+  console.log(stateStore.state.Lyric.LyricList);
+  
   // 切歌后默认从头开始播
   stateStore.updateCurrentPosition(0);
   stateStore.snapshotLastSession();
@@ -93,6 +99,7 @@ async function switchToIndex(index, ctx) {
 
   eventBus.emit("current_track_changed", {
     current: stateStore.get("current_track"),
+    lyric:stateStore.state.Lyric.LyricList,
   });
   eventBus.emit("play_state_changed", {
     is_playing: true,
@@ -199,9 +206,10 @@ async function handleSeek(payload, ctx) {
   storage.saveState(stateStore.getState());
 
   // 仍然复用 current_track_changed，把 position 带出去
-  eventBus.emit("current_track_changed", {
-    current: stateStore.get("current_track"),
-  });
+  // eventBus.emit("current_track_changed", {
+  //   current: stateStore.get("current_track"),
+  // });
+ 
 }
 
 /** 处理前端上报 */
@@ -225,6 +233,16 @@ async function handlePositionReport(payload, ctx) {
   eventBus.emit("position_changed", {
     current: stateStore.get("current_track"),
   });
+
+   currentIndex= LrcParser.findLyricByTime(position);
+  console.log(currentIndex);
+  if (currentIndex!== stateStore.state.Lyric.currentLyricRow){
+    eventBus.emit("lyric_index_changed", {
+            index: currentIndex,
+          });
+          console.log("歌词的索引变化了");
+      stateStore.state.Lyric.currentLyricRow = currentIndex;
+  }
   // console.log("[handlePositionReport]:"+stateStore.state.current_track.position);
 }
 

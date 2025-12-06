@@ -37,6 +37,8 @@ const discoManager = new DiscoManager();
 
 const mediaControl = new MediaControl();
 
+const lyricManager = new LyricManager();
+
 // ============== AudioManager → 后端 / UI ==============
 
 // audioManager.callbacks.onPlayStateChange = (isPlaying) => {
@@ -125,6 +127,16 @@ listUI.callbacks.onItemAdded = (item) => {
   console.log("[frontend] 添加列表项：", item.id, item.titleText);
 };
 
+//绑定歌词按钮
+listUI.callbacks.onContactLyric= (item) => {
+  console.log("[frontend] 绑定列表项：", item.id);
+  const idx = idToIndexMap.get(item.id);
+  if (typeof idx === "number") {
+    sendIntent("bind_list_track", { index: idx });
+  } else {
+    console.warn("[frontend] 删除时找不到 index，对应 id:", idx);
+  }
+}
 // 删除歌曲：转成 index 给后端
 listUI.callbacks.onItemRemoved = (item) => {
   console.log("[frontend] 删除列表项：", item.id);
@@ -273,6 +285,9 @@ ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
 
     // 高亮列表当前项
     highlightCurrentTrack(current);
+    console.log("[曲目变化]:"+payload.lyric);
+    lyricManager._rebuildLyriclist(payload?.lyric);
+
     return;
   }
 
@@ -296,5 +311,10 @@ ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
   if (name === "cover_reply") {
     discoManager.setCover(payload?.cover || "");
     mediaControl.updateArtwork(payload?.cover);
+  }
+
+  if(name ==="lyric_index_changed") {
+    console.log("歌词进度改变"+payload.index);
+    lyricManager.scrollToCurrentItem(payload?.index);
   }
 });

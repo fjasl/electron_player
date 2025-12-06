@@ -5,6 +5,7 @@ const { initBackend } = require("./backend_init");
 
 const storage = require("./storage");
 
+let win = null;
 let stateStoreInstance = null;
 
 function createWindow() {
@@ -21,7 +22,6 @@ function createWindow() {
   });
 
   // 初始化后端状态机 + IPC
-  stateStoreInstance = initBackend(win);
 
   win.loadFile(path.join(__dirname, "index.html"));
 
@@ -84,7 +84,7 @@ function createTray() {
     },
   ]);
 
-  appIcon.setToolTip("我的 Electron 应用"); // 设置鼠标悬停时的提示文本
+  appIcon.setToolTip("yun_player"); // 设置鼠标悬停时的提示文本
   appIcon.setContextMenu(contextMenu);
 
   // 可选：点击托盘图标时显示窗口
@@ -93,9 +93,11 @@ function createTray() {
   });
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+  
   createWindow();
   createTray();
+  stateStoreInstance =await initBackend(win);
 });
 
 // app.on("window-all-closed", () => {

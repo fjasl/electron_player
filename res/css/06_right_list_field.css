@@ -8,9 +8,17 @@
     padding: 0 0 0 5%;
 }
 
-.list_item_del_box {
-    flex: 2;
+.list_item_lyric_bind_box{
+    flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
 }
+
+.list_item_del_box {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+

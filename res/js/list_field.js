@@ -24,6 +24,7 @@ class ListUIController {
       onItemSelect: null, // 单击选中 (itemData)
       onItemAdded: null, // 添加完成 (itemData)
       // 这里的 onItemRemoved = 用户点击删除按钮（删除请求）
+      onContactLyric:null,
       onItemRemoved: null, // (itemData)
       onFilePickClick: null, // 点左侧文件夹按钮
       onFindBtnClick: null, //点击寻找按钮后回调
@@ -76,7 +77,17 @@ class ListUIController {
   _bindItemEvents(itemData) {
     const { el } = itemData;
     const delBox = el.querySelector(".list_item_del_box");
-
+    const conTactBtn =el.querySelector(".list_item_lyric_bind_box");
+    console.log("[绑定按钮检查]:"+conTactBtn);
+    
+    if(conTactBtn){
+      conTactBtn.addEventListener("click",(e)=>{
+        console.log("[绑定按钮触发]");
+        e.stopPropagation();
+        this.callbacks.onContactLyric?.(itemData);
+      });
+    }
+    
     // 删除按钮（右侧垃圾桶）
     if (delBox) {
       delBox.addEventListener("click", (e) => {
@@ -137,6 +148,9 @@ class ListUIController {
       <div class="list_item_info">
         <i class="fa-solid fa-music"></i>
         <div class="text_ellipsis">${titleText}</div>
+      </div>
+      <div class="list_item_lyric_bind_box">
+      <i class="fa-solid fa-file-contract"></i>
       </div>
       <div class="list_item_del_box">
         <i class="fa-solid fa-trash-can"></i>

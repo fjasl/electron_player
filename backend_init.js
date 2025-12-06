@@ -1,4 +1,5 @@
 // backend_init.js
+const LrcParser = require("./handlers/lyric");
 const { ipcMain } = require("electron");
 const eventBus = require("./event_bus");
 const stateMachine = require("./state_machine");
@@ -7,7 +8,7 @@ const storage = require("./storage");
 const { registerPlaylistHandlers } = require("./handlers/playlist");
 const { registerPlaybackHandlers } = require("./handlers/playback");
 
-function initBackend(win) {
+async function initBackend(win) {
   // 让 EventBus 知道往哪个窗口发事件
   eventBus.bindWindow(win);
 
@@ -17,6 +18,10 @@ function initBackend(win) {
     console.log("[BackendInit] loaded app_state.json");
     stateStore.hydrateFromStorage(loadedState);
     stateStore.state.current_track.is_playing = false;
+    stateStore.state.Lyric.LyricList = await LrcParser.loadAndParseLrcFile(
+      stateStore.state.current_track.lyric_bind
+    );
+    stateStore.state.Lyric.currentLyricRow = 0;
   } else {
     console.log("[BackendInit] no existing state file, using defaults");
   }
@@ -53,7 +58,10 @@ function initBackend(win) {
     const ct = stateStore.get("current_track");
     if (ct && ct.id) {
       // console.log("[BackendInit] emit current_track_changed on startup");
-      eventBus.emit("current_track_changed", { current: ct });
+      eventBus.emit("current_track_changed", {
+        current: ct,
+        lyric: stateStore.state.Lyric.LyricList,
+      });
     }
 
     if (stateStore && stateStore.state.play_mode) {

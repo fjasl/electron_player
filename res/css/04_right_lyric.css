@@ -1,0 +1,46 @@
+#lyric_content_box {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 5% 0 5% 0;
+  -webkit-app-region: no-drag;
+}
+#lyric_box {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  gap: 10%;
+  overflow-y: auto; /* 关键：允许垂直滚动 */
+  overflow-x: hidden; /* 只隐藏横向 */
+
+  /* --- 隐藏滚动条的关键代码 --- */
+
+  /* 针对 Webkit 浏览器 (Chrome, Safari, Opera, Edge) */
+  &::-webkit-scrollbar {
+    display: none; /* 核心：不渲染滚动条 */
+    width: 0; /* 辅助：确保不占用任何空间 */
+    height: 0;
+  }
+
+  /* 针对 IE and Edge (遗留属性) */
+  -ms-overflow-style: none;
+
+  /* 针对 Firefox */
+  scrollbar-width: none;
+}
+
+.lyric_item {
+  width: 100%;
+  min-width: 0;
+  font-size: 20px;
+  color: #ffffff;
+  word-wrap: break-word; /* 确保长单词也能被强制换行 */
+  white-space: normal; /* 确保空白符和换行符正常处理（默认值） */
+  text-align: center; /* 核心：使每一行文本水平居中对齐 */
+}

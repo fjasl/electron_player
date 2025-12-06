@@ -176,9 +176,55 @@ async function handleDelListTrack(payload, ctx) {
   eventBus.emit("playlist_changed", { playlist: stateStore.get("playlist") });
 }
 
+async function handleBindLyric(payload, ctx) {
+  const { stateStore, storage, eventBus } = ctx;
+  const index = typeof payload?.index === "number" ? payload.index : -1;
+
+  const ret = await dialog.showOpenDialog({
+    title: "选择歌词文件",
+    properties: ["openFile"],
+    filters: [
+      {
+        name: "txt",
+        extensions: ["lrc"],
+      },
+      { name: "All Files", extensions: ["*"] },
+    ],
+  });
+
+  if (ret.canceled || !ret.filePaths || ret.filePaths.length === 0) {
+    console.log("[open_files] user canceled");
+    return;
+  }
+
+  const filePath = ret.filePaths[0];
+  console.log("[open_files] selected:", filePath);
+
+  if (index < 0) {
+    console.warn("[bind_list_track] invalid index:", payload);
+    return;
+  }
+
+  let list = stateStore.get("playlist") || [];
+  if (list.length === 0) return;
+
+  const pos = list.findIndex((t) => t.index === index);
+  if (pos === -1) {
+    console.warn("[bind_list_track] index not found in playlist:", index);
+    return;
+  }
+  console.warn("[bind_list_track] pos:" + pos);
+  list[pos].lyric_bind = filePath;
+  console.warn("[bind_list_track] open file:" + list);
+
+  stateStore.setPlaylist(list);
+  storage.saveState(stateStore.getState());
+}
+
 function registerPlaylistHandlers(stateMachine) {
   stateMachine.registerHandler("open_files", handleOpenFiles);
   stateMachine.registerHandler("del_list_track", handleDelListTrack);
+  stateMachine.registerHandler("bind_list_track", handleBindLyric);
 }
 
 module.exports = {
