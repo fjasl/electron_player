@@ -39,8 +39,13 @@
   width: 100%;
   min-width: 0;
   font-size: 20px;
-  color: #ffffff;
+  color: #a5a5a5;
   word-wrap: break-word; /* 确保长单词也能被强制换行 */
   white-space: normal; /* 确保空白符和换行符正常处理（默认值） */
   text-align: center; /* 核心：使每一行文本水平居中对齐 */
+}
+
+.lyric_item_active{
+  color: #fff;
+  font-size: 25px;
 }

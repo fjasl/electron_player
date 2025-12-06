@@ -2,14 +2,21 @@ class LyricManager {
   constructor() {
     this.lyricBox = document.getElementById("lyric_box");
     this.lyricList = []; //{index,el}
+    this.actArr = [];
   }
 
+  _appendArr(index) {
+    this.actArr.push(index);
+    if (this.actArr.length > 2) {
+      this.actArr.shift();
+    }
+  }
   _rebuildLyriclist(lyricArray) {
-
     let index = 0;
     // 清空现有内容，确保重新构建
     this.lyricBox.innerHTML = "";
     this.lyricList = [];
+    this.actArr = [];
     // 遍历传入的歌词数据数组
     lyricArray.forEach((item) => {
       // 创建一个新的 div 元素，并赋予其 .lyric_item 类
@@ -30,6 +37,19 @@ class LyricManager {
     });
   }
   scrollToCurrentItem(index) {
+    this._appendArr(index);
+    if (this.actArr.length === 2) {
+      this.lyricList[this.actArr[0]].lyricItem.classList.remove(
+        "lyric_item_active"
+      );
+      this.lyricList[this.actArr[1]].lyricItem.classList.add(
+        "lyric_item_active"
+      );
+    } else {
+      this.lyricList[this.actArr[0]].lyricItem.classList.add(
+        "lyric_item_active"
+      );
+    }
     const listBox = this.lyricBox;
 
     if (!index || !listBox) return;
@@ -62,23 +82,6 @@ class LyricManager {
       top: scrollTo,
       behavior: "smooth",
     });
-
-    // 如果需要兼容不支持 'smooth' behavior 的旧浏览器，可以使用：
-    // listBox.scrollTop = scrollTo;
-
-    // if (!index) return;
-    // const item = this.lyricList.find((it) => it.index === index);
-    // if (!item || !item.lyricItem) return;
-    // // 使用原生的 scrollIntoView 方法
-    // // behavior: 'smooth' 提供平滑滚动动画
-    // // block: 'center' 尝试将元素顶部与容器中心对齐
-    // item.lyricItem.scrollIntoView({
-    //   behavior: "smooth",
-    //   block: "nearest", // 垂直方向对齐到中央
-    //   // inline: 'nearest' // 水平方向只在需要时滚动（这里不需要）
-    // });
-    // 如果您的列表项不在 listBox 而是其他可滚动容器中，
-    // 确保该容器设置了正确的 CSS overflow 属性（如 overflow-y: auto/scroll）。
   }
 }
 

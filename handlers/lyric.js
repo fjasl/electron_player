@@ -58,45 +58,48 @@ const LrcParser = (function () {
    */
   async function loadAndParseLrcFile(filePath) {
     try {
-      const lrcContent = await fs.readFile(filePath, "utf-8");
+      if (filePath === "") {
+        list = [{ time: 0, text: "纯音乐，请欣赏" }]
+        return list;
+      } else {
+        const lrcContent = await fs.readFile(filePath, "utf-8");
 
-      const lines = lrcContent.split("\n");
-      const lyrics = [];
+        const lines = lrcContent.split("\n");
+        const lyrics = [];
 
-      // 正则表达式依然捕获所有时间格式，但在 timeToSeconds 中处理为带毫秒的秒
-      const lineRegex = /^\[(\d{2}:\d{2}(?:\.\d{1,3})?)\](.*)/;
+        // 修正正则表达式：匹配各种毫秒格式（0-6位数字）
+        const lineRegex = /^\[(\d{2}:\d{2}(?:\.\d{1,6})?)\](.*)/;
+        lines.forEach((line) => {
+          const trimmedLine = line.trim();
+          if (!trimmedLine) return;
 
-      lines.forEach((line) => {
-        const trimmedLine = line.trim();
-        if (!trimmedLine) return;
+          let match = trimmedLine.match(lineRegex);
 
-        let match = trimmedLine.match(lineRegex);
+          if (match) {
+            const timestamp = match[1];
+            const text = match[2].trim();
 
-        if (match) {
-          const timestamp = match[1];
-          const text = match[2].trim(); 
+            // 此处调用 timeToSeconds，返回的是带毫秒的秒数
+            const timeInSecondsValue = timeToSeconds(timestamp);
 
-          // 此处调用 timeToSeconds，返回的是带毫秒的秒数
-          const timeInSecondsValue = timeToSeconds(timestamp); 
-
-          if (!isNaN(timeInSecondsValue) && text) {
-            lyrics.push({
-              time: timeInSecondsValue,
-              text: text,
-            });
+            if (!isNaN(timeInSecondsValue) && text) {
+              lyrics.push({
+                time: timeInSecondsValue,
+                text: text,
+              });
+            }
           }
-        }
-      });
+        });
 
-      // 过滤掉时间为 0 且文本为空的行（元数据行通常时间为 0 但有文本，我们保留它们）
-      const filteredLyrics = lyrics.filter(item => item.text.length > 0);
+        // 过滤掉时间为 0 且文本为空的行（元数据行通常时间为 0 但有文本，我们保留它们）
+        const filteredLyrics = lyrics.filter((item) => item.text.length > 0);
 
-      // 按照时间戳（带毫秒精度的秒数）排序
-      filteredLyrics.sort((a, b) => a.time - b.time);
+        // 按照时间戳（带毫秒精度的秒数）排序
+        filteredLyrics.sort((a, b) => a.time - b.time);
 
-      list = filteredLyrics; // 更新模块内部的 list 变量
-      return filteredLyrics;
-      
+        list = filteredLyrics; // 更新模块内部的 list 变量
+        return filteredLyrics;
+      }
     } catch (error) {
       console.error("加载或解析LRC文件时出错:", error);
       list = [];

@@ -101,8 +101,9 @@ async function switchToIndex(index, ctx) {
     current: stateStore.get("current_track"),
     lyric:stateStore.state.Lyric.LyricList,
   });
+  stateStore.state.is_playing=true;
   eventBus.emit("play_state_changed", {
-    is_playing: true,
+    is_playing: stateStore.state.is_playing,
   });
 }
 
