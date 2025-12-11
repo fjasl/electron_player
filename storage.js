@@ -23,7 +23,7 @@ class Storage {
       }
       return null;
     } catch (e) {
-      console.warn("[Storage] loadState error:", e.message);
+      //console.warn("[Storage] loadState error:", e.message);
       return null;
     }
   }
@@ -37,7 +37,7 @@ class Storage {
       const json = JSON.stringify(state, null, 2);
       fs.writeFileSync(STATE_FILE, json, "utf-8");
     } catch (e) {
-      console.warn("[Storage] saveState error:", e.message);
+      //console.warn("[Storage] saveState error:", e.message);
     }
   }
 }

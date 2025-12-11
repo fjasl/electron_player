@@ -21,7 +21,10 @@ const LrcParser = (function () {
     const minutes = parseInt(parts[0], 10);
     const secondsParts = parts[1].split(".");
     const seconds = parseInt(secondsParts[0], 10);
-    const milliseconds = secondsParts[1] ? parseInt(secondsParts[1], 10) : 0;
+    
+    const msString = secondsParts[1]?secondsParts[1].slice(0,3):"0";
+
+    const milliseconds = parseInt(msString,10);
 
     if (isNaN(minutes) || isNaN(seconds)) {
       return NaN;
@@ -68,7 +71,7 @@ const LrcParser = (function () {
         const lyrics = [];
 
         // 修正正则表达式：匹配各种毫秒格式（0-6位数字）
-        const lineRegex = /^\[(\d{2}:\d{2}(?:\.\d{1,6})?)\](.*)/;
+        const lineRegex = /^\[(\d+:\d+(?:\.\d+)?)\](.*)/;
         lines.forEach((line) => {
           const trimmedLine = line.trim();
           if (!trimmedLine) return;
@@ -101,7 +104,7 @@ const LrcParser = (function () {
         return filteredLyrics;
       }
     } catch (error) {
-      console.error("加载或解析LRC文件时出错:", error);
+      // console.error("加载或解析LRC文件时出错:", error);
       list = [];
       throw error;
     }

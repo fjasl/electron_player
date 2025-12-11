@@ -13,7 +13,7 @@ function makeTrackId(base, idx) {
  */
 async function handleOpenFiles(_payload, ctx) {
   const { stateStore, storage, eventBus } = ctx;
-  console.log(stateStore);
+  // console.log(stateStore);
   const ret = await dialog.showOpenDialog({
     title: "选择音乐文件",
     properties: ["openFile", "multiSelections"],
@@ -27,13 +27,13 @@ async function handleOpenFiles(_payload, ctx) {
   });
 
   if (ret.canceled || !ret.filePaths || ret.filePaths.length === 0) {
-    console.log("[open_files] user canceled");
+    // console.log("[open_files] user canceled");
     return;
   }
 
   // 原始选择
   const filePaths = ret.filePaths;
-  console.log("[open_files] selected:", filePaths);
+  // console.log("[open_files] selected:", filePaths);
 
   // 1) 同一次选择里去重（避免用户在对话框里点了重复的）
   const seenInDialog = new Set();
@@ -52,17 +52,11 @@ async function handleOpenFiles(_payload, ctx) {
   const freshPaths = uniqueInDialog.filter((p) => !existingPaths.has(p));
 
   if (freshPaths.length === 0) {
-    console.log(
-      "[open_files] all selected files already in playlist, nothing to add"
-    );
+    // console.log("[open_files] all selected files already in playlist, nothing to add");
     return;
   }
 
-  console.log(
-    "[open_files] after dedupe, new files:",
-    freshPaths.length,
-    freshPaths
-  );
+  // console.log("[open_files] after dedupe, new files:",freshPaths.length,freshPaths);
 
   // 3) 提取真实元数据（只对真正要新增的文件做）
   const metaList = await extractTracksMetadata(freshPaths);
@@ -99,7 +93,7 @@ async function handleOpenFiles(_payload, ctx) {
   // 7) 广播 playlist_changed（payload 中只带 playlist）
   eventBus.emit("playlist_changed", { playlist });
 
-  console.log("[open_files] playlist length:", playlist.length);
+  // console.log("[open_files] playlist length:", playlist.length);
 }
 
 /**
@@ -111,7 +105,7 @@ async function handleDelListTrack(payload, ctx) {
   const index = typeof payload?.index === "number" ? payload.index : -1;
 
   if (index < 0) {
-    console.warn("[del_list_track] invalid index:", payload);
+    // console.warn("[del_list_track] invalid index:", payload);
     return;
   }
 
@@ -120,12 +114,12 @@ async function handleDelListTrack(payload, ctx) {
 
   const pos = list.findIndex((t) => t.index === index);
   if (pos === -1) {
-    console.warn("[del_list_track] index not found in playlist:", index);
+    // console.warn("[del_list_track] index not found in playlist:", index);
     return;
   }
 
   const removed = list.splice(pos, 1)[0];
-  console.log("[del_list_track] removed:", removed);
+  // console.log("[del_list_track] removed:", removed);
 
   // 重新归一化 index => 0..n-1
   list.forEach((t, i) => {
@@ -193,15 +187,15 @@ async function handleBindLyric(payload, ctx) {
   });
 
   if (ret.canceled || !ret.filePaths || ret.filePaths.length === 0) {
-    console.log("[open_files] user canceled");
+    // console.log("[open_files] user canceled");
     return;
   }
 
   const filePath = ret.filePaths[0];
-  console.log("[open_files] selected:", filePath);
+  // console.log("[open_files] selected:", filePath);
 
   if (index < 0) {
-    console.warn("[bind_list_track] invalid index:", payload);
+    // console.warn("[bind_list_track] invalid index:", payload);
     return;
   }
 
@@ -210,12 +204,12 @@ async function handleBindLyric(payload, ctx) {
 
   const pos = list.findIndex((t) => t.index === index);
   if (pos === -1) {
-    console.warn("[bind_list_track] index not found in playlist:", index);
+    // console.warn("[bind_list_track] index not found in playlist:", index);
     return;
   }
-  console.warn("[bind_list_track] pos:" + pos);
+  // console.warn("[bind_list_track] pos:" + pos);
   list[pos].lyric_bind = filePath;
-  console.warn("[bind_list_track] open file:" + list);
+  // console.warn("[bind_list_track] open file:" + list);
 
   stateStore.setPlaylist(list);
   storage.saveState(stateStore.getState());

@@ -89,7 +89,7 @@ function createTray() {
 
   // 可选：点击托盘图标时显示窗口
   appIcon.on("click", () => {
-    mainWindow.isVisible() ? mainWindow.hide() : mainWindow.show();
+    win.isVisible() ? win.hide() : win.show();
   });
 }
 
@@ -105,11 +105,11 @@ app.whenReady().then(async () => {
 // });
 
 app.on("will-quit", () => {
-  console.log("应用即将退出，正在保存状态...");
+  // console.log("应用即将退出，正在保存状态...");
   if (stateStoreInstance) {
     storage.saveState(stateStoreInstance.getState());
-    console.log("状态保存完毕。");
+    // console.log("状态保存完毕。");
   } else {
-    console.warn("未找到 stateStore 实例，无法保存状态。");
+    // console.warn("未找到 stateStore 实例，无法保存状态。");
   }
 });

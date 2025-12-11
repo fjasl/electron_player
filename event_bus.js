@@ -12,7 +12,7 @@ class EventBus {
 
   emit(eventName, payload = {}) {
     if (!this.win) {
-      console.warn("[EventBus] no window bound, event:", eventName);
+      // console.warn("[EventBus] no window bound, event:", eventName);
       return;
     }
     this.win.webContents.send(this.channel, {

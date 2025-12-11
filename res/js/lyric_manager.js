@@ -35,6 +35,7 @@ class LyricManager {
       this.lyricList.push({ index, lyricItem });
       index++;
     });
+    this.scrollToCurrentItem(0);
   }
   scrollToCurrentItem(index) {
     this._appendArr(index);

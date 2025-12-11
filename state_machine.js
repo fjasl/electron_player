@@ -15,7 +15,7 @@ class StateMachine {
   async dispatch(intent, payload = {}) {
     const handler = this.handlers[intent];
     if (!handler) {
-      console.warn("[StateMachine] unknown intent:", intent);
+      //console.warn("[StateMachine] unknown intent:", intent);
       return;
     }
 
@@ -29,7 +29,7 @@ class StateMachine {
     try {
       await handler(payload, ctx);
     } catch (e) {
-      console.error("[StateMachine] handler error:", intent, e);
+      //console.error("[StateMachine] handler error:", intent, e);
     }
   }
 

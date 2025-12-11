@@ -15,7 +15,7 @@ async function initBackend(win) {
   // 1. 载入本地完整状态
   const loadedState = storage.loadState();
   if (loadedState) {
-    console.log("[BackendInit] loaded app_state.json");
+    // console.log("[BackendInit] loaded app_state.json");
     stateStore.hydrateFromStorage(loadedState);
     stateStore.state.current_track.is_playing = false;
     stateStore.state.Lyric.LyricList = await LrcParser.loadAndParseLrcFile(
@@ -23,7 +23,7 @@ async function initBackend(win) {
     );
     stateStore.state.Lyric.currentLyricRow = 0;
   } else {
-    console.log("[BackendInit] no existing state file, using defaults");
+    // console.log("[BackendInit] no existing state file, using defaults");
   }
 
   // 2. 注册各类 intent -> handler

@@ -52,7 +52,7 @@ async function switchToIndex(index, ctx) {
 
   const track = stateStore.findTrackByIndex(index);
   if (!track) {
-    console.warn("[playback] switchToIndex: track not found:", index);
+    // console.warn("[playback] switchToIndex: track not found:", index);
     return;
   }
 
@@ -73,7 +73,7 @@ async function switchToIndex(index, ctx) {
       duration = typeof meta.duration === "number" ? meta.duration : 0;
     }
   } catch (e) {
-    console.warn("[playback] metadata failed:", track.path, e.message);
+    // console.warn("[playback] metadata failed:", track.path, e.message);
   }
 
   const currentLiked = stateStore.get("settings")?.likedTrackIds?.includes(track.id);
@@ -90,7 +90,7 @@ async function switchToIndex(index, ctx) {
     lyric_bind : track.lyric_bind,
   });
   stateStore.state.Lyric.LyricList=await LrcParser.loadAndParseLrcFile(track.lyric_bind);
-  console.log(stateStore.state.Lyric.LyricList);
+  // console.log(stateStore.state.Lyric.LyricList);
   
   // 切歌后默认从头开始播
   stateStore.updateCurrentPosition(0);
@@ -101,9 +101,9 @@ async function switchToIndex(index, ctx) {
     current: stateStore.get("current_track"),
     lyric:stateStore.state.Lyric.LyricList,
   });
-  stateStore.state.is_playing=true;
+  stateStore.state.current_track.is_playing=true;
   eventBus.emit("play_state_changed", {
-    is_playing: stateStore.state.is_playing,
+    is_playing: stateStore.state.current_track.is_playing,
   });
 }
 
@@ -112,7 +112,7 @@ async function handlePlayListTrack(payload, ctx) {
   const { index } = payload || {};
 
   if (typeof index !== "number" || index < 0) {
-    console.warn("[play_list_track] invalid index:", index);
+    // console.warn("[play_list_track] invalid index:", index);
     return;
   }
   await switchToIndex(index, ctx);
@@ -127,7 +127,7 @@ async function handlePlayNext(_payload, ctx) {
   const ct = stateStore.get("current_track") || {};
   const currentIndex = typeof ct.index === "number" ? ct.index : -1;
   const playMode = stateStore.get("play_mode") || "single_loop";
-  console.log(ct,currentIndex,playMode);
+  // console.log(ct,currentIndex,playMode);
 
   const nextIndex = pickNextIndex(playMode, playlist, currentIndex, +1);
   if (nextIndex === -1) return;
@@ -179,7 +179,7 @@ async function handleSetPlayMode(payload, ctx) {
 
 
 
-  console.log(stateStore.state.play_mode)
+  // console.log(stateStore.state.play_mode)
   // stateStore.setPlayMode(currentMode);
   stateStore.snapshotLastSession();
   storage.saveState(stateStore.getState());
@@ -236,12 +236,10 @@ async function handlePositionReport(payload, ctx) {
   });
 
    currentIndex= LrcParser.findLyricByTime(position);
-  console.log(currentIndex);
   if (currentIndex!== stateStore.state.Lyric.currentLyricRow){
     eventBus.emit("lyric_index_changed", {
             index: currentIndex,
           });
-          console.log("歌词的索引变化了");
       stateStore.state.Lyric.currentLyricRow = currentIndex;
   }
   // console.log("[handlePositionReport]:"+stateStore.state.current_track.position);
@@ -264,7 +262,7 @@ async function handleLike(_payload, ctx) {
     current: stateStore.get("current_track"),
   });
 
-  console.log("[like] 当前曲目 likedCount:", stateStore.get("current_track").likedCount);
+  // console.log("[like] 当前曲目 likedCount:", stateStore.get("current_track").likedCount);
 }
 
 async function handleCoverrequest(_payload, ctx) {

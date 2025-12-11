@@ -40,7 +40,7 @@ async function extractOne(filePath) {
       sizeBytes,
     };
   } catch (e) {
-    console.warn("[metadata] parse fail:", filePath, e.message);
+    //console.warn("[metadata] parse fail:", filePath, e.message);
     // 解析失败时：至少保证有 path + 一个可展示的 title
     return {
       path: filePath,
@@ -80,7 +80,7 @@ async function extractTracksMetadata(filePaths) {
 //       return bufferToBase64DataURI(picture.data, picture.format);
 //     }
 //   } catch (e) {
-//     console.warn("[metadata] cover art parse fail:", filePath, e.message);
+//     //console.warn("[metadata] cover art parse fail:", filePath, e.message);
 //   }
 //   return null;
 // }
@@ -93,31 +93,30 @@ async function extractCoverArt(filePath) {
     
     const picture = metadata.common?.picture?.[0];
     if (!picture) {
-      console.log("[metadata] No picture found in:", filePath);
+      //console.log("[metadata] No picture found in:", filePath);
       return null;
     }
     
-    console.log("[metadata] Picture data type:", typeof picture.data);
-    console.log("[metadata] Picture data constructor:", picture.data?.constructor?.name);
-    console.log("[metadata] Picture format:", picture.format);
+    //console.log("[metadata] Picture data type:", typeof picture.data);
+    //console.log("[metadata] Picture data constructor:", picture.data?.constructor?.name);
+    //console.log("[metadata] Picture format:", picture.format);
     
     // 转换数据为 Buffer
     let imageBuffer;
     if (Buffer.isBuffer(picture.data)) {
       imageBuffer = picture.data;
-      console.log("[metadata] Data is already a Buffer, length:", imageBuffer.length);
+      //console.log("[metadata] Data is already a Buffer, length:", imageBuffer.length);
     } else if (picture.data) {
       imageBuffer = Buffer.from(picture.data);
-      console.log("[metadata] Converted to Buffer, length:", imageBuffer.length);
+      //console.log("[metadata] Converted to Buffer, length:", imageBuffer.length);
     } else {
-      console.log("[metadata] No data in picture");
+      //console.log("[metadata] No data in picture");
       return null;
     }
     
     // 检查前几个字节
     if (imageBuffer.length > 0) {
-      console.log("[metadata] First few bytes:", 
-        Array.from(imageBuffer.slice(0, 10)).join(','));
+      //console.log("[metadata] First few bytes:", Array.from(imageBuffer.slice(0, 10)).join(','));
     }
     
     // 获取 MIME 类型
@@ -128,16 +127,16 @@ async function extractCoverArt(filePath) {
     
     // 生成 base64
     const base64 = imageBuffer.toString('base64');
-    console.log("[metadata] Base64 preview (first 50 chars):", base64.substring(0, 50));
+    //console.log("[metadata] Base64 preview (first 50 chars):", base64.substring(0, 50));
     
     const dataURI = `data:${mimeType};base64,${base64}`;
     
     // 验证 data URI 格式
-    console.log("[metadata] Data URI preview (first 80 chars):", dataURI.substring(0, 80));
+    //console.log("[metadata] Data URI preview (first 80 chars):", dataURI.substring(0, 80));
     
     return dataURI;
   } catch (e) {
-    console.warn("[metadata] cover art parse fail:", filePath, e.message);
+    //console.warn("[metadata] cover art parse fail:", filePath, e.message);
     return null;
   }
 }
