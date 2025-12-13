@@ -27,12 +27,14 @@ class StateStore {
       },
 
       play_mode: "single_loop",
+      volume: 0,
 
       last_session: {
         id: null,
         path: null,
         position: 0,
         play_mode: "single_loop",
+        lyric_bind:null,
       },
 
       settings: {},
@@ -196,6 +198,8 @@ class StateStore {
 
     // settings
     if (loaded.settings) this.state.settings = loaded.settings;
+
+    if (typeof loaded.volume ==="number") this.state.volume = loaded.volume; 
   }
 }
 

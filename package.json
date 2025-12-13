@@ -9,13 +9,15 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "electron .",
+    "dev":"electronmon .",
     "build": "electron-builder"
   },
   "keywords": [],
   "author": "",
   "devDependencies": {
     "electron": "^39.2.4",
-    "electron-builder": "^24.0.0"
+    "electron-builder": "^24.0.0",
+    "electronmon": "^2.0.4"
   },
   "build": {
     "appId": "com.yun.app",
@@ -26,13 +28,12 @@
       "!.gitignore"
     ],
     "directories": {
-      "output": "dist" 
+      "output": "dist"
     },
     "win": {
-      "target": "nsis", 
-      "icon": "icon.ico" 
+      "target": "nsis",
+      "icon": "icon.ico"
     }
-    
   },
   "license": "ISC"
 }

@@ -102,6 +102,10 @@ playUI.callbacks.onLyricJump = () => {
   //console.log("[frontend] 跳转歌词界界面");
   tabController.switchTab("lyric");
 };
+playUI.callbacks.onVolumeChange = (percent) =>{
+  sendIntent("volume_change",{percent});
+}
+
 
 // ============== 列表界面 → 后端意图 ==============
 
@@ -316,5 +320,11 @@ ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
   if(name ==="lyric_index_changed") {
     //console.log("歌词进度改变"+payload.index);
     lyricManager.scrollToCurrentItem(payload?.index);
+  }
+
+  if(name ==="volume_changed"){
+    playUI.setVolume(payload?.percent);
+    audioManager.setVolume(payload?.percent);
+
   }
 });

@@ -33,8 +33,7 @@ function pickNextIndex(playMode, playlist, currentIndex, direction) {
       }
     }
     return idx;
-  }
-  else{
+  } else {
     currentIndex;
   }
   // 默认：顺序循环
@@ -61,7 +60,6 @@ async function switchToIndex(index, ctx) {
   let artist = null;
   let duration = 0;
   let cover = "";
- 
 
   try {
     const metas = await extractTracksMetadata([track.path]);
@@ -76,7 +74,9 @@ async function switchToIndex(index, ctx) {
     // console.warn("[playback] metadata failed:", track.path, e.message);
   }
 
-  const currentLiked = stateStore.get("settings")?.likedTrackIds?.includes(track.id);
+  const currentLiked = stateStore
+    .get("settings")
+    ?.likedTrackIds?.includes(track.id);
 
   stateStore.setCurrentTrackFromTrack({
     id: track.id,
@@ -87,11 +87,13 @@ async function switchToIndex(index, ctx) {
     duration,
     liked: !!currentLiked,
     cover,
-    lyric_bind : track.lyric_bind,
+    lyric_bind: track.lyric_bind,
   });
-  stateStore.state.Lyric.LyricList=await LrcParser.loadAndParseLrcFile(track.lyric_bind);
+  stateStore.state.Lyric.LyricList = await LrcParser.loadAndParseLrcFile(
+    track.lyric_bind
+  );
   // console.log(stateStore.state.Lyric.LyricList);
-  
+
   // 切歌后默认从头开始播
   stateStore.updateCurrentPosition(0);
   stateStore.snapshotLastSession();
@@ -99,9 +101,9 @@ async function switchToIndex(index, ctx) {
 
   eventBus.emit("current_track_changed", {
     current: stateStore.get("current_track"),
-    lyric:stateStore.state.Lyric.LyricList,
+    lyric: stateStore.state.Lyric.LyricList,
   });
-  stateStore.state.current_track.is_playing=true;
+  stateStore.state.current_track.is_playing = true;
   eventBus.emit("play_state_changed", {
     is_playing: stateStore.state.current_track.is_playing,
   });
@@ -153,31 +155,25 @@ async function handlePlayPrev(_payload, ctx) {
 
 /** 播放/暂停 */
 async function handlePlayToggle(payload, ctx) {
-
   const { stateStore, storage, eventBus } = ctx;
   stateStore.setPlaying(!stateStore.state.current_track.is_playing);
-  
+
   stateStore.snapshotLastSession();
   storage.saveState(stateStore.getState());
 
   eventBus.emit("play_state_changed", {
     is_playing: stateStore.state.current_track.is_playing,
   });
-
 }
 
 /** 设置播放模式（来自 UI 的 loop/one/shuffle） */
 async function handleSetPlayMode(payload, ctx) {
   const { stateStore, storage, eventBus } = ctx;
-  if(stateStore.state.play_mode ==="single_loop")
-  {
-    stateStore.state.play_mode ="shuffle";
+  if (stateStore.state.play_mode === "single_loop") {
+    stateStore.state.play_mode = "shuffle";
+  } else {
+    stateStore.state.play_mode = "single_loop";
   }
-  else{
-    stateStore.state.play_mode ="single_loop";
-  }
-
-
 
   // console.log(stateStore.state.play_mode)
   // stateStore.setPlayMode(currentMode);
@@ -210,7 +206,6 @@ async function handleSeek(payload, ctx) {
   // eventBus.emit("current_track_changed", {
   //   current: stateStore.get("current_track"),
   // });
- 
 }
 
 /** 处理前端上报 */
@@ -235,16 +230,15 @@ async function handlePositionReport(payload, ctx) {
     current: stateStore.get("current_track"),
   });
 
-   currentIndex= LrcParser.findLyricByTime(position);
-  if (currentIndex!== stateStore.state.Lyric.currentLyricRow){
+  currentIndex = LrcParser.findLyricByTime(position);
+  if (currentIndex !== stateStore.state.Lyric.currentLyricRow) {
     eventBus.emit("lyric_index_changed", {
-            index: currentIndex,
-          });
-      stateStore.state.Lyric.currentLyricRow = currentIndex;
+      index: currentIndex,
+    });
+    stateStore.state.Lyric.currentLyricRow = currentIndex;
   }
   // console.log("[handlePositionReport]:"+stateStore.state.current_track.position);
 }
-
 
 /** like曲目 当前曲目 */
 async function handleLike(_payload, ctx) {
@@ -266,9 +260,17 @@ async function handleLike(_payload, ctx) {
 }
 
 async function handleCoverrequest(_payload, ctx) {
-  const {stateStore,storage, eventBus} = ctx;
+  const { stateStore, storage, eventBus } = ctx;
   eventBus.emit("cover_reply", {
     cover: stateStore.state.current_track.cover,
+  });
+}
+
+function handleVolumeChange(_payload, ctx) {
+  const { stateStore, storage, eventBus } = ctx;
+  stateStore.state.volume = _payload.percent;
+  eventBus.emit("volume_changed", {
+    percent: stateStore.state.volume,
   });
 }
 
@@ -282,7 +284,8 @@ function registerPlaybackHandlers(stateMachine) {
   stateMachine.registerHandler("seek", handleSeek);
   stateMachine.registerHandler("position_report", handlePositionReport);
   stateMachine.registerHandler("like", handleLike);
-  stateMachine.registerHandler("cover_request",handleCoverrequest);
+  stateMachine.registerHandler("cover_request", handleCoverrequest);
+  stateMachine.registerHandler("volume_change", handleVolumeChange);
 }
 
 module.exports = {

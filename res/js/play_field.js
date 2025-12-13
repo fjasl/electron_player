@@ -6,6 +6,11 @@ class PlayUIController {
       title: document.getElementById("songtitle"),
       artist: document.getElementById("songartist"),
 
+      //音量条
+      volumeBox: document.getElementById("volume_bar_box"),
+      volumeTrack: document.getElementById("volume_bar_track"),
+      volumeFill: document.getElementById("volume_bar_fill"),
+
       // 控制按钮
       btnRetu: document.getElementById("return_btn"),
       btnPlay: document.getElementById("control_play_btn"),
@@ -48,6 +53,8 @@ class PlayUIController {
       onModeChange: null,
       onSeek: null,
       onLyricJump: null,
+      onVolumeClick: null,
+      onVolumeChange: null,
     };
 
     this.bindEvents();
@@ -105,11 +112,85 @@ class PlayUIController {
     this.dom.btnLyricJump.addEventListener("click", () => {
       this.callbacks.onLyricJump?.();
     });
+
+    this.dom.btnVolume.addEventListener("click", () => {
+      this.callbacks.onVolumeClick?.();
+      this.showVolumeBar();
+    });
+
+    // ===== 点击音量条调整音量 =====
+    this.dom.volumeTrack?.addEventListener("click", (e) => {
+      e.stopPropagation(); // 防止触发 document click 隐藏
+
+      const rect = this.dom.volumeTrack.getBoundingClientRect();
+
+      // 从底部向上计算（符合你的 UI）
+      const offsetY = rect.bottom - e.clientY;
+      let percent = offsetY / rect.height;
+
+      // clamp 到 0~1
+      percent = Math.max(0, Math.min(1, percent));
+
+      // 更新 UI
+      this.callbacks.onVolumeChange?.(percent);
+      // 通知后端 / audio
+    });
+
+  
+
+    // 保持原有鼠标悬浮不消失逻辑
+    this.dom.volumeBox?.addEventListener("mouseenter", () => {
+      clearTimeout(this._volumeHideTimer);
+    });
+
+    this.dom.volumeBox?.addEventListener("mouseleave", () => {
+      clearTimeout(this._volumeHideTimer);
+      this._volumeHideTimer = setTimeout(() => {
+        this.hideVolumeBar();
+      }, 1200);
+    });
+
+    this.dom.volumeBox?.addEventListener("mouseenter", () => {
+      clearTimeout(this._volumeHideTimer);
+    });
+
+    this.dom.volumeBox?.addEventListener("mouseleave", () => {
+      clearTimeout(this._volumeHideTimer);
+      this._volumeHideTimer = setTimeout(() => {
+        this.hideVolumeBar();
+      }, 1200);
+    });
   }
 
   // ================================
   // UI 更新接口（后端可随时调用）
   // ================================
+
+  showVolumeBar() {
+    if (!this.dom.volumeBox) return;
+    this.dom.volumeBox.classList.remove("hide");
+    this.dom.volumeBox.classList.add("show");
+
+    clearTimeout(this._volumeHideTimer);
+    this._volumeHideTimer = setTimeout(() => {
+      this.hideVolumeBar();
+    }, 1600);
+  }
+
+  hideVolumeBar() {
+    if (!this.dom.volumeBox) return;
+    this.dom.volumeBox.classList.remove("show");
+    this.dom.volumeBox.classList.add("hide");
+  }
+
+  toggleVolumeBar() {
+    if (!this.dom.volumeBox) return;
+    if (this.dom.volumeBox.classList.contains("show")) {
+      this.hideVolumeBar();
+    } else {
+      this.showVolumeBar();
+    }
+  }
 
   /** 更新标题与歌手 */
   setSongInfo(title, artist) {
@@ -126,9 +207,6 @@ class PlayUIController {
 
   /** 更新进度条（后端定时调用） */
   setProgress(position, duration) {
-    
-
-
     this.dom.posLabel.textContent = this.formatTime(position);
     this.dom.durationLabel.textContent = this.formatTime(duration);
     //this.dom.fill.style.width = (position / duration) * 100 + "%";
@@ -181,7 +259,7 @@ class PlayUIController {
   }
 
   switchPlayMode() {
-    const modes = ["shuffle", "shuffle"];
+    const modes = ["shuffle", "single_loop"];
     let index = modes.indexOf(this.playMode);
     this.playMode = modes[(index + 1) % modes.length];
     this.updateModeUI();
@@ -191,6 +269,17 @@ class PlayUIController {
     const icon = this.dom.btnPlayMode.querySelector("i");
     if (mode === "single_loop") icon.className = "fa-solid fa-repeat";
     else if (mode === "shuffle") icon.className = "fa-solid fa-shuffle";
+  }
+
+  // ================================
+  // 音量 UI 更新
+  // ================================
+  setVolume(volume01) {
+    this.volume = Math.max(0, Math.min(1, volume01));
+
+    if (this.dom.volumeFill) {
+      this.dom.volumeFill.style.height = `${this.volume * 100}%`;
+    }
   }
 
   // ================================

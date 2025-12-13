@@ -69,6 +69,12 @@ async function initBackend(win) {
         play_mode: stateStore.state.play_mode,
       });
     }
+    
+    if (stateStore) {
+      eventBus.emit("volume_changed", {
+        percent: stateStore.state.volume,
+      });
+    }
   });
   return stateStore;
 }

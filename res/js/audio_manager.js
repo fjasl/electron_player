@@ -108,16 +108,21 @@ class AudioManager {
     };
   }
 
+  setVolume(volume) {
+    // 确保音量在 0 和 1 之间
+    this.audio.volume = Math.max(0, Math.min(1, volume));
+  }
+
   reportProgress(is_playing) {
     if (is_playing) {
-       requestAnimationFrame(() =>this.reportProgress(is_playing));
+      requestAnimationFrame(() => this.reportProgress(is_playing));
     }
-    const timestamp = Date.now()
+    const timestamp = Date.now();
     const elapsed = timestamp - this.lastTime;
-    if(elapsed>=this.sleeptime){
-        this.lastTime = timestamp;
-        const position = this.audio.currentTime || 0;
-        sendIntent("position_report", { position });
+    if (elapsed >= this.sleeptime) {
+      this.lastTime = timestamp;
+      const position = this.audio.currentTime || 0;
+      sendIntent("position_report", { position });
     }
   }
 }

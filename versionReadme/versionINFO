@@ -4,4 +4,4 @@ V3 -> V3
 基本没有问题 删除了许多的调试输出
 V3
 |----> REFACTOR UI 将几乎所有的盒子都添加大小 以防止图标大小改变造成位置变动 
-|----> REFACTOR FUNCTION 归一下类
+|----> REFACTOR FUNCTION 归一下类 添加了音量键的实际功能
