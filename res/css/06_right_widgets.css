@@ -18,8 +18,18 @@
   line-height: 1.2;
 }
 .func_set_btn {
+  width: 10%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
+}
+.func_set_btn i {
   font-size: 20px;
+  line-height: 1;
+  width: 1.25em;
+  text-align: center;
 }
 #progress_track {
   position: relative;
@@ -32,12 +42,13 @@
 }
 #progress_fill {
   position: absolute;
+  border-radius: 0;
   inset: 0;
   transform-origin: left; /* 确保是从左侧开始缩放 */
   transform: scaleX(0); /* 初始缩放比例为 0 */
   /*width: 0%;  先写死 30%，后面用 JS 改百分比 */
   background: linear-gradient(to right, #ffffff, rgba(255, 255, 255, 0.7));
-  border-radius: inherit;
+  
   transition: transform 0.2s ease;
 }
 
@@ -50,6 +61,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  pointer-events: none; /* 不接收鼠标事件 */
+  user-select: none;
+  cursor: default !important;
 }
 #position,
 #duration {
@@ -57,46 +71,47 @@
   color: rgba(255, 255, 255, 0.6);
 }
 
-/* #control_btn {
-  --btn-size: 2.8rem;  
-
-  width: var(--btn-size);
-  height: var(--btn-size);
-  border-radius: 50%;
-  border: none;
-  outline: none;
-  cursor: pointer;
-
-  background: #2f3034; 
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  color: #ffffff;
-  font-size: 1rem;
-
- 
-  box-shadow:
-    0.25rem 0.25rem 0.5rem rgba(0, 0, 0, 0.75),      
-    -0.25rem -0.25rem 0.5rem rgba(255, 255, 255, 0.05); 
-
-  transition:
-    box-shadow 0.15s ease,
-    transform 0.15s ease,
-    background 0.15s ease;
-} */
 #control_play_btn {
-  font-size: 30px;
+  width: 20%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
+}
+#control_play_btn i {
+  font-size: 35px;
+  line-height: 1;
+  width: 1.25em;
+  text-align: center;
 }
 #control_forward_btn {
-  font-size: 20px;
+  width: 5%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
 }
-#control_next_btn {
+#control_forward_btn i {
   font-size: 20px;
+  line-height: 1;
+  width: 1.25em;
+  text-align: center;
+}
+#control_next_btn {
+  width: 5%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
+}
+#control_next_btn i {
+  font-size: 20px;
+  line-height: 1;
+  width: 1.25em;
+  text-align: center;
 }
 
 /* #disco {

@@ -1,8 +1,16 @@
 #return_btn {
+  width: 50%;
+  height: 12.5%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
 }
 #return_btn i {
   font-size: 25px;
+  line-height: 1;
+  width: 1.25em; /* 对齐 Font Awesome */
+  text-align: center;
   color: white;
 }
 #songinfo {
@@ -12,6 +20,9 @@
   flex-direction: column;
   justify-content: center;
   align-items: start;
+  pointer-events: none; /* 不接收鼠标事件 */
+  user-select: none;
+  cursor: default !important;
 }
 #funcset_box {
   flex: 1;
@@ -37,12 +48,20 @@
   justify-content: space-between;
   align-items: center;
 }
-#file_pick_btn {
+.list_func_box{
+  width: 50%;
+  height: 12.5%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
+
 }
-#file_pick_btn i {
+.list_func_box i{
   font-size: 20px;
-  color: white;
+  line-height: 1;
+  width: 1.25em;
+  text-align: center;
 }
 .list_item {
   flex: 0 0 20%;
@@ -71,10 +90,10 @@
   font-size: 20px;
   color: white;
 }
-#list_find_btn{
+#list_find_btn {
   cursor: pointer;
 }
-#list_find_btn i{
+#list_find_btn i {
   font-size: 22px;
   color: white;
 }

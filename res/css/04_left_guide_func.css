@@ -10,8 +10,17 @@
 }
 .navigation_bar i {
   font-size: 25px;
+  line-height: 1;
+  width: 1.25em;
+  text-align: center;
   color: white;
 }
 .navigation_bar {
+  width: 35%;
+  height: 12.5%;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
 }

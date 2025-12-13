@@ -43,6 +43,9 @@
   word-wrap: break-word; /* 确保长单词也能被强制换行 */
   white-space: normal; /* 确保空白符和换行符正常处理（默认值） */
   text-align: center; /* 核心：使每一行文本水平居中对齐 */
+  pointer-events: none; /* 不接收鼠标事件 */
+  user-select: none;
+  cursor: default !important;
 }
 
 .lyric_item_active{
