@@ -1,7 +1,7 @@
 // handlers/playback.js
 const path = require("path");
 const LrcParser = require("./lyric.js");
-const { extractTracksMetadata, extractCoverArt } = require("../metadata");
+const { extractTracksMetadata, extractCoverArt } = require("../units/metadata");
 const { listenerCount, emit } = require("process");
 
 /** UI 的模式到后端模式映射 */

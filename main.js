@@ -3,7 +3,7 @@ const { app, BrowserWindow, Tray, Menu, shell } = require("electron");
 const path = require("path");
 const { initBackend } = require("./backend_init");
 
-const storage = require("./storage");
+const storage = require("./units/storage");
 
 let win = null;
 let stateStoreInstance = null;

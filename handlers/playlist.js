@@ -1,7 +1,7 @@
 // handlers/playlist.js
 
 const { dialog } = require("electron");
-const { extractTracksMetadata } = require("../metadata");
+const { extractTracksMetadata } = require("../units/metadata");
 
 function makeTrackId(base, idx) {
   return `t_${base}_${idx}`;

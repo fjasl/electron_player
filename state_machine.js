@@ -1,6 +1,6 @@
 // state_machine.js
-const stateStore = require("./state_store");
-const storage = require("./storage");
+const stateStore = require("./units/state_store");
+const storage = require("./units/storage");
 const eventBus = require("./event_bus");
 
 class StateMachine {

@@ -28,7 +28,6 @@ class LyricManager {
 
       // 根据 index 可以选择是否需要对样式做特殊处理
       // 例如设置每个项的高度或者顺序标识
-      lyricItem.dataset.index = item.index;
 
       // 将生成的 lyricItem 添加到 lyricBox 中
       this.lyricBox.appendChild(lyricItem);

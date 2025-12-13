@@ -3,8 +3,8 @@ const LrcParser = require("./handlers/lyric");
 const { ipcMain } = require("electron");
 const eventBus = require("./event_bus");
 const stateMachine = require("./state_machine");
-const stateStore = require("./state_store");
-const storage = require("./storage");
+const stateStore = require("./units/state_store");
+const storage = require("./units/storage");
 const { registerPlaylistHandlers } = require("./handlers/playlist");
 const { registerPlaybackHandlers } = require("./handlers/playback");
 
