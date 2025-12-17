@@ -48,7 +48,7 @@
   transform: scaleX(0); /* 初始缩放比例为 0 */
   /*width: 0%;  先写死 30%，后面用 JS 改百分比 */
   background: linear-gradient(to right, #ffffff, rgba(255, 255, 255, 0.7));
-  
+
   transition: transform 0.2s ease;
 }
 
@@ -126,6 +126,7 @@
 /* 黑胶盘主体 */
 #disco {
   width: 90%;
+  height: auto;
   aspect-ratio: 1 / 1;
   border-radius: 50%;
   display: flex;
@@ -200,6 +201,7 @@
   overflow: hidden;
 }
 #disco_cover img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
