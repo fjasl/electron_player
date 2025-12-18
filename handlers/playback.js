@@ -223,7 +223,7 @@ async function handlePositionReport(payload, ctx) {
   });
 
   currentIndex = LrcParser.findLyricByTime(position);
-  if (currentIndex !== stateStore.get("Lyric.LyricList")) {
+  if (currentIndex !== stateStore.get("Lyric.currentLyricRow")) {
     eventBus.emit("lyric_index_changed", {
       index: currentIndex,
     });

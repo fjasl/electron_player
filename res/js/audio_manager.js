@@ -16,12 +16,25 @@ class AudioManager {
       onProgress: null,
       onEnded: null,
     };
-    this.sleeptime = 100;
-    this.lastTime = 0;
-    this._lastProgressSentAt = 0;
+
+    this._initWebAudio();
     this._bindEvents();
   }
+  _initWebAudio() {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    this._ctx = new AudioContext();
+    this._source = this._ctx.createMediaElementSource(this.audio);
 
+    // 创建 AnalyserNode 用于获取时域数据（音频流）
+    this._analyser = this._ctx.createAnalyser();
+    this._analyser.fftSize = 2048; // 可根据需要调整
+    this._analyser.smoothingTimeConstant = 0.7;
+    this._source.connect(this._analyser);
+    this._analyser.connect(this._ctx.destination);
+
+    // Buffer 用来保存获取的时域/频域数据
+    this._buffer = new Uint8Array(this._analyser.frequencyBinCount);
+  }
   _bindEvents() {
     this.audio.addEventListener("play", () => {
       this.callbacks.onPlayStateChange?.(true);
@@ -113,17 +126,20 @@ class AudioManager {
     this.audio.volume = Math.max(0, Math.min(1, volume));
   }
 
-  reportProgress(is_playing) {
-    if (is_playing) {
-      requestAnimationFrame(() => this.reportProgress(is_playing));
-    }
-    const timestamp = Date.now();
-    const elapsed = timestamp - this.lastTime;
-    if (elapsed >= this.sleeptime) {
-      this.lastTime = timestamp;
-      const position = this.audio.currentTime || 0;
-      sendIntent("position_report", { position });
-    }
+  startAudioDataProcessing() {
+    const processData = () => {
+      this._analyser.getByteFrequencyData(this._buffer);
+
+      // 只取前几个频段（你可以调整，这里以 128 为例）
+      const data = this._buffer.slice(0, 128);
+
+      // 向后端发送音频数据，转换成二进制格式以减少开销
+      ipcRenderer.send("audio-data", {data}); // 将 buffer 转移给 main
+
+      requestAnimationFrame(processData); // 继续处理下一个帧
+    };
+
+    requestAnimationFrame(processData); // 启动
   }
 }
 

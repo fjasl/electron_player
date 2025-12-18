@@ -129,11 +129,10 @@ listUI.callbacks.onContactLyric = (item) => {
 // 删除歌曲：转成 index 给后端
 listUI.callbacks.onItemRemoved = (item) => {
   //console.log("[frontend] 删除列表项：", item.id);
-  const idx = idToIndexMap.get(item.id);
+  const idx = listUI.idToIndexMap.get(item.id);
   if (typeof idx === "number") {
     sendIntent("del_list_track", { index: idx });
   } else {
-    console.warn("[frontend] 删除时找不到 index，对应 id:", id);
   }
 };
 

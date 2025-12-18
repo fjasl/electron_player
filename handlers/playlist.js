@@ -140,7 +140,7 @@ async function handleDelListTrack(payload, ctx) {
           lyric_bind: null,
           cover: "",
         });
-        stateStore.claerLyric();
+        stateStore.clearLyric();
         eventBus.emit("current_track_changed", {
                 current: stateStore.get("current_track"),
                 lyric: stateStore.get("Lyric.LyricList"),

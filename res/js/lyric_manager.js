@@ -52,7 +52,7 @@ class LyricManager {
     }
     const listBox = this.lyricBox;
 
-    if (!index || !listBox) return;
+    if (index == null || !listBox) return;
 
     // 2. 找到目标歌词项的 DOM 元素
     // 您需要根据您的数据结构获取实际的 DOM 元素引用
