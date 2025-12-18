@@ -60,100 +60,102 @@
         </div>
       </div>
       <div id="pane-right">
-        <div id="content_play" class="tab_content">
-          <div id="volume_bar_box">
-            <div id="volume_bar_track">
-              <div id="volume_bar_fill"></div>
+        <div id="right-frame">
+          <div id="content_play" class="tab_content">
+            <div id="volume_bar_box">
+              <div id="volume_bar_track">
+                <div id="volume_bar_fill"></div>
+              </div>
+            </div>
+            <!--return box-->
+            <div id="return_btn_box">
+              <div id="return_btn">
+                <i class="fa-solid fa-angle-left"></i>
+              </div>
+            </div>
+            <div id="widgets">
+              <!--songinfo-->
+              <div id="songinfo">
+                <div id="songtitle" class="text_ellipsis"></div>
+                <div id="songartist" class="text_ellipsis"></div>
+              </div>
+              <!--funcsetBox-->
+              <div id="funcset_box">
+                <div id="like_btn" class="func_set_btn">
+                  <i class="fa-regular fa-heart"></i>
+                </div>
+                <div id="playmode_btn" class="func_set_btn">
+                  <i class="fa-solid fa-repeat"></i>
+                </div>
+                <div id="lyricjump_btn" class="func_set_btn">
+                  <i class="fa-solid fa-file-lines"></i>
+                </div>
+                <div id="volume_btn" class="func_set_btn">
+                  <i class="fa-solid fa-volume-high"></i>
+                </div>
+              </div>
+              <div id="progressbar_box">
+                <div id="progress_track">
+                  <div id="progress_fill"></div>
+                </div>
+                <div id="progress_time">
+                  <div id="position" class="text_ellipsis">00:00</div>
+                  <div id="duration" class="text_ellipsis">00:00</div>
+                </div>
+              </div>
+              <!--ControlBox-->
+              <div id="control_box">
+                <div id="control_forward_btn" class="control_btn">
+                  <i class="fa-solid fa-backward-step"></i>
+                </div>
+                <div id="control_play_btn" class="control_btn">
+                  <i class="fa-solid fa-play"></i>
+                </div>
+                <div id="control_next_btn" class="control_btn">
+                  <i class="fa-solid fa-forward-step"></i>
+                </div>
+              </div>
+            </div>
+            <div id="disco_box">
+              <div id="disco">
+                <div id="disco_cover"></div>
+              </div>
             </div>
           </div>
-          <!--return box-->
-          <div id="return_btn_box">
-            <div id="return_btn">
-              <i class="fa-solid fa-angle-left"></i>
+          <div id="content_lyric" class="tab_content">
+            <div id="lyric_content_box">
+              <div id="lyric_box"></div>
             </div>
           </div>
-          <div id="widgets">
-            <!--songinfo-->
-            <div id="songinfo">
-              <div id="songtitle" class="text_ellipsis"></div>
-              <div id="songartist" class="text_ellipsis"></div>
-            </div>
-            <!--funcsetBox-->
-            <div id="funcset_box">
-              <div id="like_btn" class="func_set_btn">
-                <i class="fa-regular fa-heart"></i>
+          <div id="content_list" class="tab_content">
+            <!--List_func-->
+            <div id="list_func">
+              <div id="file_pick_btn" class="list_func_box">
+                <i class="fa-solid fa-folder-open"></i>
               </div>
-              <div id="playmode_btn" class="func_set_btn">
-                <i class="fa-solid fa-repeat"></i>
+              <div id="list_locate_btn" class="list_func_box">
+                <i class="fa-solid fa-magnifying-glass"></i>
               </div>
-              <div id="lyricjump_btn" class="func_set_btn">
-                <i class="fa-solid fa-file-lines"></i>
-              </div>
-              <div id="volume_btn" class="func_set_btn">
-                <i class="fa-solid fa-volume-high"></i>
+              <div id="list_find_btn" class="list_func_box">
+                <i class="fas fa-crosshairs"></i>
               </div>
             </div>
-            <div id="progressbar_box">
-              <div id="progress_track">
-                <div id="progress_fill"></div>
-              </div>
-              <div id="progress_time">
-                <div id="position" class="text_ellipsis">00:00</div>
-                <div id="duration" class="text_ellipsis">00:00</div>
-              </div>
-            </div>
-            <!--ControlBox-->
-            <div id="control_box">
-              <div id="control_forward_btn" class="control_btn">
-                <i class="fa-solid fa-backward-step"></i>
-              </div>
-              <div id="control_play_btn" class="control_btn">
-                <i class="fa-solid fa-play"></i>
-              </div>
-              <div id="control_next_btn" class="control_btn">
-                <i class="fa-solid fa-forward-step"></i>
-              </div>
-            </div>
+            <div id="list_box"></div>
           </div>
-          <div id="disco_box">
-            <div id="disco">
-              <div id="disco_cover"></div>
-            </div>
+          <div id="content_setting" class="tab_content">
+            设置界面内容（占位）
           </div>
         </div>
-        <div id="content_lyric" class="tab_content">
-          <div id="lyric_content_box">
-            <div id="lyric_box">
-              
-            </div>
-          </div>
-        </div>
-        <div id="content_list" class="tab_content">
-          <!--List_func-->
-          <div id="list_func">
-            <div id="file_pick_btn" class="list_func_box">
-              <i class="fa-solid fa-folder-open"></i>
-            </div>
-            <div id="list_locate_btn" class="list_func_box">
-              <i class="fa-solid fa-magnifying-glass"></i>
-            </div>
-            <div id="list_find_btn" class="list_func_box">
-              <i class="fas fa-crosshairs"></i>
-            </div>
-          </div>
-          <div id="list_box"></div>
-        </div>
-        <div id="content_setting" class="tab_content">设置界面内容（占位）</div>
       </div>
     </div>
     <audio id="player_audio" preload="auto"></audio>
 
-    <script src="res/js/menu.js"></script>
-    <script src="res/js/play_field.js"></script>
-    <script src="res/js/list_field.js"></script>
+    <script src="res/js/tab_manager.js"></script>
+    <script src="res/js/player_manager.js"></script>
+    <script src="res/js/list_manager.js"></script>
     <script src="res/js/audio_manager.js"></script>
     <script src="res/js/disco_manager.js"></script>
-    <script src="res/js/MediaControl.js"></script>
+    <script src="res/js/mediainfo_unit.js"></script>
     <script src="res/js/lyric_manager.js"></script>
     <script src="res/js/main.js"></script>
   </body>
