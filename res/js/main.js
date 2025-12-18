@@ -188,8 +188,21 @@ ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
   // 当前曲目变更（切歌 / 启动恢复 / seek / like 之后的状态）
   if (name === "current_track_changed") {
     const current = payload?.current;
-    if (!current) return;
+    if (current.index === -1) {
+      mediaControl.updateTitle("");
+      mediaControl.updateArtist("");
+      mediaControl.updateArtwork("");
 
+      playUI.setSongInfo("", "");
+      playUI.setProgress(0, 0);
+      discoManager.setCover("");
+      audioManager.unload();
+
+      currentAudioTrackPath = "";
+
+      lyricManager._rebuildLyriclist(payload?.lyric);
+      return;
+    }
     const title = current.title || "";
     const artist = current.artist || "";
     const position = current.position || 0;
@@ -207,22 +220,21 @@ ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
 
     // 每次切到新歌，都重置“本次播放是否已经点过喜欢”
     //（真正的 likedCount 在后端的 state 中维护）
-    playUI.setLiked(false);
 
     // 如果是“首切到这首歌”（或启动恢复的那首），并且 path 有效 → 让 Audio 播放
     if (current.path && current.path !== currentAudioTrackPath) {
+      playUI.setLiked(false);
       // //console.log("[frontend] loadAndPlay:", current.path, "from", position);
       audioManager.load(current.path, position || 0);
       currentAudioTrackPath = current.path;
       sendIntent("cover_request", {});
       // //console.log("[frontend] load:", current.path, "from", position);
     }
-
+    lyricManager._rebuildLyriclist(payload?.lyric);
     // 高亮列表当前项
     // highlightCurrentTrack(current);
     listUI.setCurrentItem(listUI.indexToIdMap.get(current.index));
     // //console.log("[曲目变化]:"+payload.lyric);
-    lyricManager._rebuildLyriclist(payload?.lyric);
 
     return;
   }

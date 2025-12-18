@@ -7,6 +7,7 @@ const stateStore = require("./units/state_store");
 const storage = require("./units/storage");
 const { registerPlaylistHandlers } = require("./handlers/playlist");
 const { registerPlaybackHandlers } = require("./handlers/playback");
+const PluginManager = require("./plugin_manger");
 
 async function initBackend(win) {
   // 让 EventBus 知道往哪个窗口发事件
@@ -29,6 +30,10 @@ async function initBackend(win) {
   // 2. 注册各类 intent -> handler
   registerPlaylistHandlers(stateMachine);
   registerPlaybackHandlers(stateMachine);
+
+  pluginManager = new PluginManager();
+  pluginManager.loadAll();
+  module.exports.pluginManager = pluginManager;
 
   // 3. 建立前端 → 后端：通用意图入口
   ipcMain.on("frontend-intent", (_event, msg) => {
@@ -69,4 +74,5 @@ async function initBackend(win) {
 
 module.exports = {
   initBackend,
+  get pluginManager() { return pluginManager; },
 };

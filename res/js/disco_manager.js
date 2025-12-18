@@ -67,7 +67,6 @@ class DiscoManager {
             this.coverElement.innerHTML = ''; 
             const imgElement = document.createElement('img');
             imgElement.src = imageUrl;
-            imgElement.alt = "Album Cover";
             this.coverElement.appendChild(imgElement);
             console.log("封面已加载。");
         }

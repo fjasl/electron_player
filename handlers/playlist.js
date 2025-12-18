@@ -1,8 +1,8 @@
 // handlers/playlist.js
 
 const { dialog } = require("electron");
-const { extractTracksMetadata } = require("../units/metadata");
-
+const { extractTracksMetadata, extractCoverArt } = require("../units/metadata");
+const LrcParser = require("./lyric");
 
 /**
  * intent: open_files
@@ -120,35 +120,56 @@ async function handleDelListTrack(payload, ctx) {
     t.index = i;
   });
   stateStore.setPlaylist(list);
-
+  storage.saveState(stateStore.getState());
+  eventBus.emit("playlist_changed", { playlist: stateStore.get("playlist") });
   // 处理 current_track
   const ct = stateStore.get("current_track");
   if (ct && typeof ct.index === "number" && ct.index >= 0) {
     if (ct.index === index) {
       // 删除的是当前播放曲目
       if (list.length > 0) {
-        const fallbackIndex = Math.min(index, list.length - 1);
-        const fallback = list[fallbackIndex];
+        // const fallbackIndex = Math.min(index, list.length - 1);
+        // const fallback = list[fallbackIndex];
+        const randomPos = Math.floor(Math.random() * list.length);
+        const nextTrack = list[randomPos];
+        const metaList = await extractTracksMetadata([nextTrack.path]);
+        const cover = await extractCoverArt(nextTrack.path);
         stateStore.setCurrentTrackFromTrack({
-          index: fallback.index,
-          path: fallback.path,
+          index: nextTrack.index,
+          path: nextTrack.path,
           // 这里不重新解析元数据，先清空 meta
-          title: null,
-          artist: null,
-          duration: 0,
-          likedCount: 0,
-          lyric_bind: null,
-          cover: "",
+          title: metaList[0].title,
+          artist: metaList[0].artist,
+          duration: metaList[0].duration,
+          likedCount: nextTrack.likedCount,
+          lyric_bind: nextTrack.lyric_bind,
+          cover: cover,
         });
-        stateStore.clearLyric();
-        eventBus.emit("current_track_changed", {
-                current: stateStore.get("current_track"),
-                lyric: stateStore.get("Lyric.LyricList"),
-              });
 
+        const lyric = await LrcParser.loadAndParseLrcFile(nextTrack.lyric_bind);
+        stateStore.setLyricList(lyric);
+        eventBus.emit("current_track_changed", {
+          current: stateStore.get("current_track"),
+          lyric: stateStore.get("Lyric.LyricList"),
+        });
+        stateStore.setPlaying(false);
+        eventBus.emit("play_state_changed", {
+          is_playing: stateStore.get("is_playing"),
+        });
       } else {
         // 列表空了
         stateStore.setCurrentTrackFromTrack(null);
+        stateStore.clearLyric();
+
+        eventBus.emit("current_track_changed", {
+          current: stateStore.get("current_track"),
+          lyric: stateStore.get("Lyric.LyricList"),
+        });
+
+        stateStore.setPlaying(false);
+        eventBus.emit("play_state_changed", {
+          is_playing: stateStore.get("is_playing"),
+        });
       }
     } else if (ct.index > index) {
       // 当前曲目的 index 需要左移一位
@@ -170,8 +191,6 @@ async function handleDelListTrack(payload, ctx) {
   }
 
   // 保存 & 广播
-  storage.saveState(stateStore.getState());
-  eventBus.emit("playlist_changed", { playlist: stateStore.get("playlist") });
 }
 
 async function handleBindLyric(payload, ctx) {
@@ -217,6 +236,26 @@ async function handleBindLyric(payload, ctx) {
 
   stateStore.setPlaylist(list);
   storage.saveState(stateStore.getState());
+  const ct = stateStore.get("current_track");
+  if (ct.index === list[pos].index) {
+    stateStore.setCurrentTrackFromTrack({
+      index: ct.index,
+      path: ct.path,
+      position: ct.position,
+      duration: ct.duration,
+      title: ct.title,
+      artist: ct.title,
+      likedCount: ct.likedCount,
+      lyric_bind: list[pos].lyric_bind,
+      cover: ct.cover,
+    });
+    const lyric = await LrcParser.loadAndParseLrcFile(stateStore.get("current_track.lyric_bind"));
+    stateStore.setLyricList(lyric);
+    eventBus.emit("current_track_changed", {
+      current: stateStore.get("current_track"),
+      lyric: stateStore.get("Lyric.LyricList"),
+    });
+  }
 }
 
 function registerPlaylistHandlers(stateMachine) {

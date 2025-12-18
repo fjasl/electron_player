@@ -136,7 +136,7 @@ async function extractCoverArt(filePath) {
     
     return dataURI;
   } catch (e) {
-    //console.warn("[metadata] cover art parse fail:", filePath, e.message);
+    console.warn("[metadata] cover art parse fail:", filePath, e.message);
     return null;
   }
 }

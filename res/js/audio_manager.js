@@ -83,7 +83,28 @@ class AudioManager {
       console.warn("[AudioManager] set currentTime failed:", e.message);
     }
   }
+  unload() {
+    // 1) 停止播放
+    try {
+      this.audio.pause();
+    } catch {}
 
+    // 2) 中止加载 + 清空资源
+    try {
+      this.audio.removeAttribute("src");
+    } catch {}
+    this.audio.src = ""; // 或者 "about:blank" / "data:,"
+
+    // 3) 关键：触发浏览器重置媒体元素（会 abort 当前加载/解码）
+    try {
+      this.audio.load();
+    } catch {}
+
+    // 4) 重置播放头（可选）
+    try {
+      this.audio.currentTime = 0;
+    } catch {}
+  }
   /**
    * 载入并播放一个本地文件（老行为，方便你以后需要时调用）
    */
@@ -134,7 +155,7 @@ class AudioManager {
       const data = this._buffer.slice(0, 128);
 
       // 向后端发送音频数据，转换成二进制格式以减少开销
-      ipcRenderer.send("audio-data", {data}); // 将 buffer 转移给 main
+      ipcRenderer.send("audio-data", { data }); // 将 buffer 转移给 main
 
       requestAnimationFrame(processData); // 继续处理下一个帧
     };
