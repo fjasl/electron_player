@@ -4,7 +4,7 @@ const path = require('path');
 const EventEmitter = require('events');
 
 class PluginManager extends EventEmitter {
-  constructor(pluginDir = path.join(__dirname, 'plugins')) {
+  constructor(pluginDir = path.join(process.cwd(), 'plugins')) {
     super();
     this.pluginDir = pluginDir;
     this.plugins = new Map(); // name -> { instance, module, watcher, enabled }
