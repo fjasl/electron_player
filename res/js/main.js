@@ -2,17 +2,6 @@
 
 const { ipcRenderer } = require("electron");
 
-// 发送意图到后端状态机
-function sendIntent(intent, payload = {}) {
-  ipcRenderer.send("frontend-intent", { intent, payload });
-}
-
-// 从路径里取文件名用于展示
-function titleFromPath(p) {
-  if (!p) return "未知标题";
-  const parts = p.split(/[\\/]/);
-  return parts[parts.length - 1] || p;
-}
 const tabController = new TabController();
 
 // 播放 UI 控制
@@ -21,23 +10,20 @@ const playUI = new PlayUIController();
 // 列表 UI 控制
 const listUI = new ListUIController();
 
-// 维护：列表项 id -> 后端 playlist.index 的映射
-let idToIndexMap = new Map();
-
 // 音频管理器（对应 index.html 里的 <audio id="player_audio">）
 const audioManager = new AudioManager("player_audio");
-
-// 记录当前 audio 正在播放的那一首（用后端的 track.id）
-let currentAudioTrackId = null;
-
-//记录路径
-let currentAudioPath = null;
 
 const discoManager = new DiscoManager();
 
 const mediaControl = new MediaControl();
 
 const lyricManager = new LyricManager();
+
+// 记录当前 audio 正在播放的那一首（用后端的 track.path）
+let currentAudioTrackPath = null;
+
+//记录路径
+let currentAudioPath = null;
 
 // ============== AudioManager → 后端 / UI ==============
 
@@ -102,10 +88,9 @@ playUI.callbacks.onLyricJump = () => {
   //console.log("[frontend] 跳转歌词界界面");
   tabController.switchTab("lyric");
 };
-playUI.callbacks.onVolumeChange = (percent) =>{
-  sendIntent("volume_change",{percent});
-}
-
+playUI.callbacks.onVolumeChange = (percent) => {
+  sendIntent("volume_change", { percent });
+};
 
 // ============== 列表界面 → 后端意图 ==============
 
@@ -117,7 +102,7 @@ listUI.callbacks.onItemSelect = (item) => {
 // 双击：播放该列表项
 listUI.callbacks.onItemPlay = (item) => {
   //console.log("[frontend] 双击播放：", item.id, item.titleText);
-  const idx = idToIndexMap.get(item.id);
+  const idx = listUI.idToIndexMap.get(item.id);
   if (typeof idx === "number") {
     sendIntent("play_list_track", { index: idx });
     tabController.switchTab("play");
@@ -132,7 +117,7 @@ listUI.callbacks.onItemAdded = (item) => {
 };
 
 //绑定歌词按钮
-listUI.callbacks.onContactLyric= (item) => {
+listUI.callbacks.onContactLyric = (item) => {
   //console.log("[frontend] 绑定列表项：", item.id);
   const idx = idToIndexMap.get(item.id);
   if (typeof idx === "number") {
@@ -140,7 +125,7 @@ listUI.callbacks.onContactLyric= (item) => {
   } else {
     console.warn("[frontend] 删除时找不到 index，对应 id:", idx);
   }
-}
+};
 // 删除歌曲：转成 index 给后端
 listUI.callbacks.onItemRemoved = (item) => {
   //console.log("[frontend] 删除列表项：", item.id);
@@ -157,10 +142,10 @@ listUI.callbacks.onFilePickClick = () => {
   //console.log("[frontend] 点击选择文件按钮 → intent: open_files");
   sendIntent("open_files", {});
 };
-listUI.callbacks.onFindBtnClick = (item) => {
+listUI.callbacks.onFindBtnClick = (items) => {
   //console.log("[fontend]: 定位按钮");
   const fileName = titleFromPath(currentAudioPath);
-  const targetItem = item.find((item) => item.titleText === fileName);
+  const targetItem = items.find((item) => item.titleText === fileName);
   listUI.currentId = targetItem.id;
 };
 
@@ -171,59 +156,6 @@ listUI.callbacks.onFilterChange = (kw) => {
 
 // ============== 后端 → 前端：事件驱动 UI ==============
 
-/**
- * 用后端发来的 playlist 重建列表 UI
- * playlist: [{ id, index, path }]
- */
-function rebuildListFromPlaylist(playlist) {
-  //console.log("[frontend] rebuildListFromPlaylist, len =", playlist.length);
-
-  // 1. 清空现有 DOM 列表项 & 内存数据
-  listUI.items.forEach((it) => {
-    if (it.el && it.el.parentNode) {
-      it.el.parentNode.removeChild(it.el);
-    }
-  });
-  listUI.items = [];
-  listUI.currentId = null;
-  listUI.nextId = 1;
-
-  // 2. 重置映射
-  idToIndexMap = new Map();
-
-  // 3. 渲染新列表，并建立 id -> index 映射
-  playlist.forEach((track) => {
-    const titleText = titleFromPath(track.path);
-    const item = listUI.addItem({ titleText });
-    // item 是 { id, el, titleText }
-    idToIndexMap.set(item.id, track.index);
-  });
-  
-  if(listUI.isSearching === true){
-    const kw = listUI.searchBar.value;
-    //console.log("重建列表"+kw);
-    listUI.applyFilter(kw);
-  }
-
-}
-
-/** 根据 current_track 高亮列表里对应项 */
-function highlightCurrentTrack(current) {
-  if (!current) return;
-  const playIndex = typeof current.index === "number" ? current.index : -1;
-  if (playIndex < 0) return;
-
-  let targetId = null;
-  for (const [id, idx] of idToIndexMap.entries()) {
-    if (idx === playIndex) {
-      targetId = id;
-      break;
-    }
-  }
-  if (targetId) {
-    listUI.setCurrentItem(targetId);
-  }
-}
 // ============== 系统媒体控件 ==============
 mediaControl.callbacks.onPlay = () => {
   //console.log("[frontend] 播放按钮切换：");
@@ -250,7 +182,7 @@ ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
   // 播放列表变更
   if (name === "playlist_changed") {
     const playlist = payload?.playlist || [];
-    rebuildListFromPlaylist(playlist);
+    listUI._rebuildListFromPlaylist(playlist);
     return;
   }
 
@@ -279,16 +211,17 @@ ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
     playUI.setLiked(false);
 
     // 如果是“首切到这首歌”（或启动恢复的那首），并且 path 有效 → 让 Audio 播放
-    if (current.id && current.path && current.id !== currentAudioTrackId) {
+    if (current.path && current.path !== currentAudioTrackPath) {
       // //console.log("[frontend] loadAndPlay:", current.path, "from", position);
       audioManager.load(current.path, position || 0);
-      currentAudioTrackId = current.id;
+      currentAudioTrackPath = current.path;
       sendIntent("cover_request", {});
       // //console.log("[frontend] load:", current.path, "from", position);
     }
 
     // 高亮列表当前项
-    highlightCurrentTrack(current);
+    // highlightCurrentTrack(current);
+    listUI.setCurrentItem(listUI.indexToIdMap.get(current.index));
     // //console.log("[曲目变化]:"+payload.lyric);
     lyricManager._rebuildLyriclist(payload?.lyric);
 
@@ -317,14 +250,13 @@ ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
     mediaControl.updateArtwork(payload?.cover);
   }
 
-  if(name ==="lyric_index_changed") {
+  if (name === "lyric_index_changed") {
     //console.log("歌词进度改变"+payload.index);
     lyricManager.scrollToCurrentItem(payload?.index);
   }
 
-  if(name ==="volume_changed"){
+  if (name === "volume_changed") {
     playUI.setVolume(payload?.percent);
     audioManager.setVolume(payload?.percent);
-
   }
 });

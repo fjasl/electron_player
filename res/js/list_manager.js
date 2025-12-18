@@ -6,8 +6,11 @@ class ListUIController {
     this.filePickBtn = document.getElementById("file_pick_btn");
     this.locateBtn = document.getElementById("list_locate_btn");
     this.findBtn = document.getElementById("list_find_btn");
-    this.searchBar = null;
 
+
+    this.idToIndexMap = new Map();
+    this.indexToIdMap = new Map();
+    //id到index映射
     this.nextId = 1;
     /** 真实歌曲项（不含搜索条） */
     this.items = []; // { id, el, titleText }
@@ -15,8 +18,6 @@ class ListUIController {
     this.searchRow = null;
     /** 当前选中的项 id（可选） */
     this.currentId = null;
-    //有无搜索条
-    this.isSearching = false;
 
     // 对接后端的回调
     this.callbacks = {
@@ -24,7 +25,7 @@ class ListUIController {
       onItemSelect: null, // 单击选中 (itemData)
       onItemAdded: null, // 添加完成 (itemData)
       // 这里的 onItemRemoved = 用户点击删除按钮（删除请求）
-      onContactLyric:null,
+      onContactLyric: null,
       onItemRemoved: null, // (itemData)
       onFilePickClick: null, // 点左侧文件夹按钮
       onFindBtnClick: null, //点击寻找按钮后回调
@@ -60,6 +61,38 @@ class ListUIController {
     });
   }
 
+  _rebuildListFromPlaylist(playlist) {
+    //console.log("[frontend] rebuildListFromPlaylist, len =", playlist.length);
+
+    // 1. 清空现有 DOM 列表项 & 内存数据
+    this.items.forEach((it) => {
+      if (it.el && it.el.parentNode) {
+        it.el.parentNode.removeChild(it.el);
+      }
+    });
+    this.items = [];
+    this.currentId = null;
+    this.nextId = 1;
+
+    this.idToIndexMap.clear();
+    this.indexToIdMap.clear();
+
+    // 3. 渲染新列表，并建立 id -> index 映射
+    playlist.forEach((track) => {
+      const titleText = titleFromPath(track.path);
+      const item = this.addItem({ titleText });
+      // item 是 { id, el, titleText }
+      this.idToIndexMap.set(item.id, track.index);
+      this.indexToIdMap.set(track.index,item.id);
+    });
+
+    if (this.searchRow !== null) {
+      const kw = this.searchBar.value;
+      //console.log("重建列表"+kw);
+      this.applyFilter(kw);
+    }
+  }
+
   _bindTopButtons() {
     if (this.filePickBtn) {
       this.filePickBtn.addEventListener("click", () => {
@@ -72,22 +105,30 @@ class ListUIController {
         this.toggleSearchRow();
       });
     }
+
+    if (this.findBtn) {
+      this.findBtn.addEventListener("click", () => {
+        this.callbacks.onFindBtnClick?.(this.items);
+        this.setCurrentItem(this.currentId);
+        this.scrollToCurrentItem();
+      });
+    }
   }
 
   _bindItemEvents(itemData) {
     const { el } = itemData;
     const delBox = el.querySelector(".list_item_del_box");
-    const conTactBtn =el.querySelector(".list_item_lyric_bind_box");
-    console.log("[绑定按钮检查]:"+conTactBtn);
-    
-    if(conTactBtn){
-      conTactBtn.addEventListener("click",(e)=>{
+    const conTactBtn = el.querySelector(".list_item_lyric_bind_box");
+    console.log("[绑定按钮检查]:" + conTactBtn);
+
+    if (conTactBtn) {
+      conTactBtn.addEventListener("click", (e) => {
         console.log("[绑定按钮触发]");
         e.stopPropagation();
         this.callbacks.onContactLyric?.(itemData);
       });
     }
-    
+
     // 删除按钮（右侧垃圾桶）
     if (delBox) {
       delBox.addEventListener("click", (e) => {
@@ -109,17 +150,12 @@ class ListUIController {
       this.callbacks.onItemSelect?.(itemData);
     });
 
-    this.findBtn.addEventListener("click", () => {
-      this.callbacks.onFindBtnClick?.(this.items);
-      this.setCurrentItem(this.currentId);
-      this.scrollToCurrentItem();
-    });
-
     // 双击：播放
     el.addEventListener("dblclick", (e) => {
       if (
         el.classList.contains("list_item--search") ||
-        e.target.closest(".list_item_del_box")
+        e.target.closest(".list_item_del_box")||
+        e.target.closest(".list_item_lyric_bind_box")
       ) {
         return;
       }
@@ -231,10 +267,6 @@ class ListUIController {
     return this.items.find((it) => it.id === this.currentId) || null;
   }
 
-  getCurrentItem() {
-    return this.items.find((it) => it.id === this.currentId) || null;
-  }
-
   /**
    * 将当前选中的项目滚动到视图中央（如果可能）
    * @param {string} [id=this.currentId] - 要滚动的项目ID，默认为当前选中项ID
@@ -253,9 +285,6 @@ class ListUIController {
       block: "nearest", // 垂直方向对齐到中央
       // inline: 'nearest' // 水平方向只在需要时滚动（这里不需要）
     });
-
-    // 如果您的列表项不在 listBox 而是其他可滚动容器中，
-    // 确保该容器设置了正确的 CSS overflow 属性（如 overflow-y: auto/scroll）。
   }
 
   // ================== 搜索条（列表项形态） ==================
@@ -263,12 +292,8 @@ class ListUIController {
   toggleSearchRow() {
     if (this.searchRow) {
       this._removeSearchRow();
-      this.isSearching = false;
     } else {
-      this.isSearching = true;
       this._createSearchRow();
-      this.searchBar=document.getElementById("list_search_input");
-      this.scrollToCurrentItem("find_item");
     }
   }
 
@@ -278,7 +303,7 @@ class ListUIController {
 
     const el = document.createElement("div");
     el.className = "list_item list_item--enter list_item--search";
-    el.id ="find_item";
+    el.id = "find_item";
 
     el.innerHTML = `
       <div class="list_item_info">
