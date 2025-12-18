@@ -119,7 +119,7 @@ listUI.callbacks.onItemAdded = (item) => {
 //绑定歌词按钮
 listUI.callbacks.onContactLyric = (item) => {
   //console.log("[frontend] 绑定列表项：", item.id);
-  const idx = idToIndexMap.get(item.id);
+  const idx = listUI.idToIndexMap.get(item.id);
   if (typeof idx === "number") {
     sendIntent("bind_list_track", { index: idx });
   } else {
@@ -182,7 +182,7 @@ ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
   // 播放列表变更
   if (name === "playlist_changed") {
     const playlist = payload?.playlist || [];
-    listUI._rebuildListFromPlaylist(playlist);
+    listUI.rebuildListFromPlaylist(playlist);
     return;
   }
 

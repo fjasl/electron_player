@@ -39,9 +39,7 @@ class PlayUIController {
     this.isLiked = false;
     this.playMode = "one"; // loop | one | shuffle
 
-    //节流
-    this.lastDomUpdateTime = 0;
-    this.UI_UPDATE_INTERVAL = 500;
+   
 
     // 回调接口（让后端 / 播放核心接管）
     this.callbacks = {

@@ -36,12 +36,6 @@ function pickNextIndex(playMode, playlist, currentIndex, direction) {
   } else {
     currentIndex;
   }
-  // 默认：顺序循环
-  // if (direction > 0) {
-  //   return (currentIndex + 1) % len;
-  // } else if (direction < 0) {
-  //   return (currentIndex - 1 + len) % len;
-  // }
   return currentIndex;
 }
 
@@ -74,23 +68,20 @@ async function switchToIndex(index, ctx) {
     // console.warn("[playback] metadata failed:", track.path, e.message);
   }
 
-  const currentLiked = stateStore
-    .get("settings")
-    ?.likedTrackIds?.includes(track.id);
+  // const currentLiked = stateStore.get("settings")?.likedTrackIds?.includes(track.id);
 
   stateStore.setCurrentTrackFromTrack({
-    id: track.id,
     index: track.index,
     path: track.path,
     title,
     artist,
     duration,
-    liked: !!currentLiked,
+    likedCount: track.likedCount,
     cover,
     lyric_bind: track.lyric_bind,
   });
-  stateStore.state.Lyric.LyricList = await LrcParser.loadAndParseLrcFile(
-    track.lyric_bind
+  stateStore.setLyricList(
+    await LrcParser.loadAndParseLrcFile(track.lyric_bind)
   );
   // console.log(stateStore.state.Lyric.LyricList);
 
@@ -101,11 +92,12 @@ async function switchToIndex(index, ctx) {
 
   eventBus.emit("current_track_changed", {
     current: stateStore.get("current_track"),
-    lyric: stateStore.state.Lyric.LyricList,
+    lyric: stateStore.get("Lyric.LyricList"),
   });
-  stateStore.state.current_track.is_playing = true;
+  // stateStore.state.current_track.is_playing = true;
+  stateStore.setPlaying(true);
   eventBus.emit("play_state_changed", {
-    is_playing: stateStore.state.current_track.is_playing,
+    is_playing: stateStore.get("is_playing"),
   });
 }
 
@@ -156,13 +148,13 @@ async function handlePlayPrev(_payload, ctx) {
 /** 播放/暂停 */
 async function handlePlayToggle(payload, ctx) {
   const { stateStore, storage, eventBus } = ctx;
-  stateStore.setPlaying(!stateStore.state.current_track.is_playing);
+  stateStore.setPlaying(!stateStore.get("is_playing"));
 
   stateStore.snapshotLastSession();
   storage.saveState(stateStore.getState());
 
   eventBus.emit("play_state_changed", {
-    is_playing: stateStore.state.current_track.is_playing,
+    is_playing: stateStore.get("is_playing"),
   });
 }
 
@@ -170,9 +162,9 @@ async function handlePlayToggle(payload, ctx) {
 async function handleSetPlayMode(payload, ctx) {
   const { stateStore, storage, eventBus } = ctx;
   if (stateStore.state.play_mode === "single_loop") {
-    stateStore.state.play_mode = "shuffle";
+    stateStore.setPlayMode("shuffle");
   } else {
-    stateStore.state.play_mode = "single_loop";
+    stateStore.setPlayMode("single_loop");
   }
 
   // console.log(stateStore.state.play_mode)
@@ -181,7 +173,7 @@ async function handleSetPlayMode(payload, ctx) {
   storage.saveState(stateStore.getState());
 
   eventBus.emit("play_mode_changed", {
-    play_mode: stateStore.state.play_mode,
+    play_mode: stateStore.get("play_mode"),
   });
 }
 
@@ -231,11 +223,11 @@ async function handlePositionReport(payload, ctx) {
   });
 
   currentIndex = LrcParser.findLyricByTime(position);
-  if (currentIndex !== stateStore.state.Lyric.currentLyricRow) {
+  if (currentIndex !== stateStore.get("Lyric.LyricList")) {
     eventBus.emit("lyric_index_changed", {
       index: currentIndex,
     });
-    stateStore.state.Lyric.currentLyricRow = currentIndex;
+    stateStore.setCurrentLyricRow(currentIndex);
   }
   // console.log("[handlePositionReport]:"+stateStore.state.current_track.position);
 }
@@ -255,14 +247,12 @@ async function handleLike(_payload, ctx) {
   eventBus.emit("track_being_liked", {
     current: stateStore.get("current_track"),
   });
-
-  // console.log("[like] 当前曲目 likedCount:", stateStore.get("current_track").likedCount);
 }
 
 async function handleCoverrequest(_payload, ctx) {
   const { stateStore, storage, eventBus } = ctx;
   eventBus.emit("cover_reply", {
-    cover: stateStore.state.current_track.cover,
+    cover: stateStore.get("current_track.cover"),
   });
 }
 
@@ -270,7 +260,7 @@ function handleVolumeChange(_payload, ctx) {
   const { stateStore, storage, eventBus } = ctx;
   stateStore.state.volume = _payload.percent;
   eventBus.emit("volume_changed", {
-    percent: stateStore.state.volume,
+    percent: stateStore.get("volume"),
   });
 }
 

@@ -61,7 +61,7 @@ class ListUIController {
     });
   }
 
-  _rebuildListFromPlaylist(playlist) {
+  rebuildListFromPlaylist(playlist) {
     //console.log("[frontend] rebuildListFromPlaylist, len =", playlist.length);
 
     // 1. 清空现有 DOM 列表项 & 内存数据

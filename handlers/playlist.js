@@ -3,9 +3,6 @@
 const { dialog } = require("electron");
 const { extractTracksMetadata } = require("../units/metadata");
 
-function makeTrackId(base, idx) {
-  return `t_${base}_${idx}`;
-}
 
 /**
  * intent: open_files
@@ -62,9 +59,7 @@ async function handleOpenFiles(_payload, ctx) {
   const metaList = await extractTracksMetadata(freshPaths);
 
   // 4) 构造只包含 id / path 的 track，交给 stateStore 维护 index
-  const baseIdSeed = Date.now().toString(36);
   const newTracks = metaList.map((meta, i) => ({
-    id: makeTrackId(baseIdSeed, i),
     path: meta.path,
   }));
 
@@ -78,7 +73,6 @@ async function handleOpenFiles(_payload, ctx) {
     const firstMeta = metaList[0];
 
     stateStore.setCurrentTrackFromTrack({
-      id: firstTrack.id,
       index: firstTrack.index,
       path: firstTrack.path,
       title: firstMeta.title,
@@ -136,14 +130,22 @@ async function handleDelListTrack(payload, ctx) {
         const fallbackIndex = Math.min(index, list.length - 1);
         const fallback = list[fallbackIndex];
         stateStore.setCurrentTrackFromTrack({
-          id: fallback.id,
           index: fallback.index,
           path: fallback.path,
           // 这里不重新解析元数据，先清空 meta
           title: null,
           artist: null,
           duration: 0,
+          likedCount: 0,
+          lyric_bind: null,
+          cover: "",
         });
+        stateStore.claerLyric();
+        eventBus.emit("current_track_changed", {
+                current: stateStore.get("current_track"),
+                lyric: stateStore.get("Lyric.LyricList"),
+              });
+
       } else {
         // 列表空了
         stateStore.setCurrentTrackFromTrack(null);
@@ -154,12 +156,14 @@ async function handleDelListTrack(payload, ctx) {
       const newTrack = list.find((t) => t.index === newIndex);
       if (newTrack) {
         stateStore.setCurrentTrackFromTrack({
-          id: newTrack.id,
           index: newTrack.index,
           path: newTrack.path,
           title: ct.title,
           artist: ct.artist,
           duration: ct.duration,
+          likedCount: ct.likedCount,
+          lyric_bind: ct.lyric_bind,
+          cover: ct.cover,
         });
       }
     }
