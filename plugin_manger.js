@@ -4,14 +4,11 @@ const path = require("path");
 const EventEmitter = require("events");
 const { app } = require("electron");
 
-// >>>>> 添加此行以判断当前环境是否为开发/未打包模式 <<<<<
-const isDevelopment = process.env.NODE_ENV === 'development' || !app.isPackaged;
-
 class PluginManager extends EventEmitter {
   constructor(pluginDir = path.join(app.getAppPath(), "plugins")) {
     super();
     this.pluginDir = pluginDir;
-    this.plugins = new Map(); // name -> { instance, module, watcher, enabled }
+    this.plugins = new Map(); // name -> { instance, module, enabled }
     this.deps = null;
     this.ensurePluginDir();
   }
@@ -27,7 +24,6 @@ class PluginManager extends EventEmitter {
       if (!this.deps) {
         throw new Error(`[PluginManager] 核心依赖尚未注入，无法创建 API`);
       }
-      console.log(`[PluginManager] 创建插件目录: ${this.pluginDir}`);
       this.deps.eventBus.log(`[PluginManager] 创建插件目录: ${this.pluginDir}`);
     }
   }
@@ -94,24 +90,12 @@ class PluginManager extends EventEmitter {
         pluginInstance.init(api); // 兼容旧写法
       }
 
-      // >>>>> 仅在开发环境设置文件监视 (热重载) <<<<<
-      let watcher = undefined;
-      if (isDevelopment) {
-        watcher = fs.watch(filePath, (eventType) => {
-          if (eventType === "change") {
-            this.deps.eventBus.log(
-              `[PluginManager] 检测到插件修改: ${filename}，正在热重载...`
-            );
-            this.reloadPlugin(pluginName);
-          }
-        });
-      }
       this.plugins.set(pluginName, {
         instance: pluginInstance,
         module: PluginModule,
         filePath,
         filename,
-        watcher, // watcher 现在可能是 undefined
+        //watcher, // watcher 现在可能是 undefined
         enabled: true,
       });
       this.deps.eventBus.log(
@@ -134,33 +118,14 @@ class PluginManager extends EventEmitter {
     }
   }
 
-  // 重载插件（热重载核心）
-  reloadPlugin(name) {
-    const info = this.plugins.get(name);
-    if (!info) return false;
-
-    this.deps.eventBus.log(`[PluginManager] 正在重载插件: ${name}`);
-
-    // 先卸载
-    this.unloadPlugin(name, false); // false 表示不关闭 watcher
-
-    // 再加载
-    this.loadPlugin(info.filename);
-    return true;
-  }
-
   // 卸载插件
-  unloadPlugin(name, closeWatcher = true) {
+  unloadPlugin(name /*closeWatcher = true*/) {
     const info = this.plugins.get(name);
     if (!info) return false;
 
     try {
       if (typeof info.instance.deactivate === "function") {
         info.instance.deactivate();
-      }
-
-      if (closeWatcher && info.watcher) {
-        info.watcher.close();
       }
 
       this.plugins.delete(name);
@@ -224,7 +189,7 @@ class PluginManager extends EventEmitter {
       once: (event, callback) => eventBus.once(event, callback),
       off: (event, callback) => eventBus.off?.(event, callback),
 
-      // 注册自定义意图
+      // 注册自定义意图处理
       registerIntent: (intent, handler) => {
         stateMachine.registerHandler(intent, handler);
         eventBus.log(`[${pluginName}] 注册意图: ${intent}`);
