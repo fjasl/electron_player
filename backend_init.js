@@ -46,6 +46,20 @@ async function initBackend(win) {
     stateMachine.dispatch(intent, payload);
   });
 
+  // ==========================================
+  // 【新添加位置】：高频音频数据转发
+  // ==========================================
+  ipcMain.on("audio-data", (_event, buffer) => {
+    // console.log("收到音频数据长度:", buffer.length);
+    // 通过 module.exports 访问是为了确保引用的是当前正在运行的实例
+    const serverPlugin = pluginManager.getPlugin("ServerPlugin");
+
+    // 只有当插件存在且有活跃连接时才执行广播
+    if (serverPlugin && typeof serverPlugin.broadcastAudio === "function") {
+      serverPlugin.broadcastAudio(buffer);
+    }
+  });
+
   win.webContents.on("did-finish-load", () => {
     const PLAYLIST = stateStore.get("playlist") || [];
     if (PLAYLIST.length > 0) {

@@ -19,6 +19,7 @@ class AudioManager {
 
     this._initWebAudio();
     this._bindEvents();
+    this.startAudioDataProcessing();
   }
   _initWebAudio() {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -27,8 +28,8 @@ class AudioManager {
 
     // 创建 AnalyserNode 用于获取时域数据（音频流）
     this._analyser = this._ctx.createAnalyser();
-    this._analyser.fftSize = 2048; // 可根据需要调整
-    this._analyser.smoothingTimeConstant = 0.7;
+    this._analyser.fftSize = 1024; // 可根据需要调整
+    this._analyser.smoothingTimeConstant = 0.8;
     this._source.connect(this._analyser);
     this._analyser.connect(this._ctx.destination);
 
@@ -148,19 +149,24 @@ class AudioManager {
   }
 
   startAudioDataProcessing() {
-    const processData = () => {
-      this._analyser.getByteFrequencyData(this._buffer);
+    const sliceSize = 128;
+    const frequencyData = new Uint8Array(this._analyser.frequencyBinCount);
 
-      // 只取前几个频段（你可以调整，这里以 128 为例）
-      const data = this._buffer.slice(0, 128);
+    // 停止之前的计时器（如果有）
+    if (this._audioTimer) clearInterval(this._audioTimer);
 
-      // 向后端发送音频数据，转换成二进制格式以减少开销
-      ipcRenderer.send("audio-data", { data }); // 将 buffer 转移给 main
+    // 使用 setInterval 保证后台运行
+    // 16ms 对应约 60fps，如果你想降低 CPU 占用，可以设为 32ms (30fps)
+    this._audioTimer = setInterval(() => {
+      // 即使窗口隐藏，AudioContext 依然在后台运行，数据依然可以获取
+      this._analyser.getByteFrequencyData(frequencyData);
+      const visualData = frequencyData.subarray(0, sliceSize);
 
-      requestAnimationFrame(processData); // 继续处理下一个帧
-    };
+      // 如果全为 0，说明没声音，可以跳过发送节省性能
+      //if (visualData[0] === 0 && visualData[sliceSize - 1] === 0) return;
 
-    requestAnimationFrame(processData); // 启动
+      ipcRenderer.send("audio-data", visualData);
+    }, 16);
   }
 }
 

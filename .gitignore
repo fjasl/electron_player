@@ -1,4 +1,5 @@
 /node_modules
 /res/font
 /dist
+/test
 app_state.json
