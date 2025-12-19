@@ -1,9 +1,9 @@
 // storage.js
 const fs = require("fs");
 const path = require("path");
-
+const {app} = require("electron");
 // 整个应用状态存这里
-const STATE_FILE = path.join(process.cwd(), "app_state.json");
+const STATE_FILE = path.join(app.getAppPath(), "app_state.json");
 
 class Storage {
   /**

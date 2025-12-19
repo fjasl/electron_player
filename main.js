@@ -23,7 +23,7 @@ function createWindow() {
 
   // 初始化后端状态机 + IPC
 
-  win.loadFile(path.join(__dirname, "index.html"));
+  win.loadFile(path.join(app.getAppPath(), "index.html"));
 
   // 方便你看整个链路
   //win.webContents.openDevTools({ mode: "detach" });
@@ -32,7 +32,7 @@ function createWindow() {
 function createTray() {
   // 确保您有一个图标文件。这里使用一个 Electron 默认的图标作为示例。
   // 您应该替换为您自己的应用图标路径，例如 './assets/icon.png'
-  const iconPath = path.join(__dirname, "icon.png");
+  const iconPath = path.join(app.getAppPath(), "icon.png");
 
   appIcon = new Tray(iconPath);
 
