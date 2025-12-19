@@ -1,108 +1,63 @@
-const http = require('http');
-const WebSocket = require('ws');
-const url = require('url');
+// plugins/server_plugin.js
+const fastify = require('fastify');
+const websocket = require('@fastify/websocket');
 
 class ServerPlugin {
   constructor() {
     this.name = 'ServerPlugin';
     this.port = 3000;
-    this.clients = new Set();
-    this.server = null;
-    this.wss = null;
   }
 
-  activate(api) {
+  async activate(api) {
     this.api = api;
+    this.server = fastify();
 
-    this.server = http.createServer((req, res) => {
-      const parsedUrl = url.parse(req.url, true);
-      const pathname = parsedUrl.pathname;
+    // 注册 WebSocket 支持
+    await this.server.register(websocket);
 
-      // 统一跨域处理
-      res.setHeader('Access-Control-Allow-Origin', '*');
-      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-      res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    // HTTP 接口
+    this.server.get('/state', (req, reply) => {
+      reply.send(this.api.getState());
+    });
 
-      if (req.method === 'OPTIONS') {
-        res.writeHead(204);
-        return res.end();
-      }
-
-      if (req.method === 'GET') {
-        if (pathname === '/state') {
-          res.writeHead(200, { 'Content-Type': 'application/json' });
-          return res.end(JSON.stringify(this.api.getState()));
-        } 
-        if (pathname === '/playlist') {
-          res.writeHead(200, { 'Content-Type': 'application/json' });
-          return res.end(JSON.stringify(this.api.get('playlist', [])));
-        }
-      } 
+    // WebSocket 接口
+    this.server.get('/*', { websocket: true }, (connection, req) => {
+      connection.socket.send(JSON.stringify({ type: 'init', payload: this.api.getState() }));
       
-      if (req.method === 'POST' && pathname === '/intent') {
-        let body = '';
-        req.on('data', chunk => body += chunk);
-        req.on('end', () => {
-          try {
-            const { intent, payload = {} } = JSON.parse(body);
-            // 【改进】：直接使用 api 暴露的 dispatch，不再 require 外部
-            this.api.dispatch(intent, payload); 
-            res.writeHead(200);
-            res.end('OK');
-          } catch (e) {
-            res.writeHead(400);
-            res.end('Invalid JSON');
-          }
-        });
-        return;
-      }
-
-      res.writeHead(404);
-      res.end('Not Found');
-    });
-
-    this.wss = new WebSocket.Server({ server: this.server });
-
-    this.wss.on('connection', (ws) => {
-      this.clients.add(ws);
-      ws.send(JSON.stringify({ type: 'init', payload: this.api.getState() }));
-
-      ws.on('message', (message) => {
+      connection.socket.on('message', message => {
         try {
-          const { intent, payload = {} } = JSON.parse(message.toString());
+          const { intent, payload } = JSON.parse(message.toString());
           this.api.dispatch(intent, payload);
-        } catch (e) {
-          this.api.error('WebSocket 消息解析失败');
-        }
+        } catch (e) {}
       });
-
-      ws.on('close', () => this.clients.delete(ws));
-    });
-
-    this.server.listen(this.port, () => {
-      this.api.log(`HTTP & WebSocket Server 运行在端口: ${this.port}`);
     });
 
     // 事件转发
-    const events = ['playlist_changed', 'current_track_changed', 'play_mode_changed', 'volume_changed'];
-    events.forEach(event => {
-      this.api.on(event, (payload) => this.broadcast(event, payload));
+    const handler = (payload, eventName) => {
+      this.server.websocketServer.clients.forEach(client => {
+        if (client.readyState === 1) {
+          client.send(JSON.stringify({ type: eventName, payload }));
+        }
+      });
+    };
+
+    ['playlist_changed', 'current_track_changed'].forEach(event => {
+      this.api.on(event, (data) => handler(data, event));
     });
+
+    try {
+      await this.server.listen({ port: this.port, host: '0.0.0.0' });
+      this.api.log(`服务器已启动: http://localhost:${this.port}`);
+    } catch (err) {
+      this.api.error('启动失败', err);
+    }
   }
 
-  broadcast(event, payload) {
-    const msg = JSON.stringify({ type: event, payload });
-    this.clients.forEach(ws => {
-      if (ws.readyState === WebSocket.OPEN) ws.send(msg);
-    });
-  }
-
-  deactivate() {
-    // 【关键】：必须关闭所有连接和服务器，否则热重载会端口冲突
-    this.clients.forEach(ws => ws.terminate());
-    if (this.wss) this.wss.close();
-    if (this.server) this.server.close();
-    this.api?.log('ServerPlugin 已彻底释放资源');
+  async deactivate() {
+    if (this.server) {
+      await this.server.close();
+      this.api.log('服务器已关闭');
+    }
   }
 }
 
