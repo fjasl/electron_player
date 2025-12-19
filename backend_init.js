@@ -37,6 +37,7 @@ async function initBackend(win) {
     eventBus,
     stateMachine,
   });
+  pluginManager.registerUIRequestIntent();
   module.exports.pluginManager = pluginManager;
 
   // 3. 建立前端 → 后端：通用意图入口

@@ -22,3 +22,58 @@
   width: 0; /* 确保不占用任何空间 */
   height: 0;
 }
+#setting_plug_box {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  align-items: flex-start; /* 顶部对齐 */
+  flex-wrap: wrap;
+  gap: 2%;
+  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+.setting_plug_item {
+  /* 宽度设置为 25%，因为你需要一行排满4个 */
+  /* 使用 calc 减去间距，防止溢出 */
+  width: calc(25% - 10px);
+  height: 30%; /* 根据你之前设置的 30% 高度 */
+
+  /* 移除 flex-shrink: 0，让浏览器自动管理排列 */
+  /* flex-shrink: 0; */
+
+  /* 保持之前的居中和样式 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: rgba(137, 137, 137, 0.927);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+  box-sizing: border-box; /* 确保 padding/border 不计入 width/height */
+  overflow: hidden;
+}
+.plug_item_name {
+  font-family: "SourceHanSansSC", sans-serif;
+  overflow: hidden; /* 隐藏超出容器的文本 */
+  text-overflow: ellipsis; /* 将被隐藏的文本替换为省略号 */
+  width: 90%; /* 确保文本有明确的宽度限制 */
+  text-align: center; /* 保持居中对齐 */
+}
+.plug_item_active {
+  background-color: #87c0d1;
+}
+#wrench_view_box{
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+#wrench_view iframe {
+  width: 100%;
+  height: 100%;
+  border: none; /* 可选：移除 iframe 默认的边框 */
+}

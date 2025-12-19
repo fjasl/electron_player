@@ -3,6 +3,7 @@ const fs = require("fs");
 const path = require("path");
 const EventEmitter = require("events");
 const { app } = require("electron");
+const { handlers } = require("./state_machine");
 
 class PluginManager extends EventEmitter {
   constructor(pluginDir = path.join(app.getAppPath(), "plugins")) {
@@ -11,6 +12,7 @@ class PluginManager extends EventEmitter {
     this.plugins = new Map(); // name -> { instance, module, enabled }
     this.deps = null;
     this.ensurePluginDir();
+    this.Pluglist = []; // 存储扫描到的插件元数据
   }
 
   injectDeps(deps) {
@@ -28,23 +30,105 @@ class PluginManager extends EventEmitter {
     }
   }
 
-  // 加载所有插件
+  // 加载所有插件 (修改版：支持二级目录检测)
   loadAll() {
-    const files = fs
-      .readdirSync(this.pluginDir)
-      .filter((file) => file.endsWith(".js"));
-    this.deps.eventBus.log(
-      `[PluginManager] 发现 ${files.length} 个插件文件，正在加载...`
-    );
-    for (const file of files) {
-      this.loadPlugin(file);
-    }
+    this.Pluglist = [];
+    const entries = fs.readdirSync(this.pluginDir, { withFileTypes: true });
 
+    for (const entry of entries) {
+      if (entry.isDirectory()) {
+        const folderPath = path.join(this.pluginDir, entry.name);
+        const files = fs.readdirSync(folderPath);
+
+        const jsFiles = files.filter((f) => f.endsWith(".js"));
+        const htmlFiles = files.filter((f) => f.endsWith(".html"));
+
+        if (jsFiles.length === 1) {
+          const jsName = jsFiles[0];
+          const htmlName = htmlFiles.length > 0 ? htmlFiles[0] : null;
+
+          // 记录到 Pluglist
+          this.Pluglist.push({
+            plugpath: path.join(folderPath, jsName),
+            plugUI: htmlName ? path.join(folderPath, htmlName) : null,
+          });
+          // 直接调用你原本的 loadPlugin 逻辑
+          // 注意：传给 loadPlugin 的是相对于 pluginDir 的路径，如 "folder/plugin.js"
+          this.loadPlugin(path.join(entry.name, jsName));
+          this.deps.eventBus.emit("plugin_loaded", { name: jsName });
+        } else if (jsFiles.length > 1) {
+          this.deps.eventBus.log(
+            `[PluginManager] 跳过 ${entry.name}: JS数量错误`
+          );
+        }
+      }
+    }
     this.deps.eventBus.log(
-      `[PluginManager] 所有插件加载完成，共 ${this.plugins.size} 个`
+      `[PluginManager] 扫描并尝试加载了 ${this.Pluglist.length} 个插件`
     );
   }
+  registerUIRequestIntent() {
+    if (!this.deps || !this.deps.stateMachine) {
+      console.error("[PluginManager] 无法注册意图：缺少状态机依赖。");
+      return;
+    }
 
+    // 注册意图 "plugin_ui_request"
+    this.deps.stateMachine.registerHandler("plugin_ui_request", (payload) => {
+      const pluginName = payload.name;
+      const htmlContent = this.getPluginUIHtml(pluginName);
+      if (htmlContent) {
+        // 如果成功获取 HTML，通过 EventBus 发送回复到前端主窗口
+        // 事件名为 "plugin_ui_reply"
+        this.deps.eventBus.emit("plugin_ui_reply", { html: htmlContent });
+        this.deps.eventBus.log(`[PluginManager] 已响应 UI 请求: ${pluginName}`);
+      } else {
+        // 发送一个失败回复
+        this.deps.eventBus.emit("plugin_ui_reply", {
+          html: `<p style="padding: 20px;">无法加载 UI。</p>`,
+        });
+      }
+
+      // 注意：registerHandler 的返回值通常不直接影响前端，而是通过 EventBus 广播。
+      return { success: !!htmlContent };
+    });
+  }
+  /**
+   * [新增方法] 根据插件名称获取其 UI HTML 内容
+   * @param {string} pluginName 插件名称 (文件夹名)
+   * @returns {string|null} HTML 字符串或 null
+   */
+  getPluginUIHtml(pluginName) {
+    // 从 this.Pluglist 中查找对应的元数据
+    const pluginMeta = this.Pluglist.find((meta) => {
+      // 使用 path 模块获取文件名，并移除扩展名
+      const fileName = path.basename(
+        meta.plugpath
+      );
+      if (fileName === pluginName){
+        return meta.plugUI;
+      }
+      // 将文件名与请求的名称进行比较
+      
+    });
+    if (pluginMeta && pluginMeta.plugUI) {
+      try {
+        // 使用 fs 模块同步读取 HTML 文件内容
+        const htmlContent = fs.readFileSync(pluginMeta.plugUI, "utf8");
+        return htmlContent;
+      } catch (err) {
+        this.deps.eventBus.log(
+          `[PluginManager] 无法读取 ${pluginName} 的 UI 文件: ${err.message}`
+        );
+        return null;
+      }
+    } else {
+      this.deps.eventBus.log(
+        `[PluginManager] 未找到插件 ${pluginName} 或其 UI 文件路径。`
+      );
+      return null;
+    }
+  }
   //加载单个插件;
   loadPlugin(filename) {
     const filePath = path.join(this.pluginDir, filename);
@@ -177,9 +261,10 @@ class PluginManager extends EventEmitter {
     const { stateStore, eventBus, stateMachine } = this.deps;
     return {
       name: pluginName,
+      eventPasser:eventBus,
       log: (...args) => eventBus.log(`[${pluginName}]`, ...args),
       error: (...args) => eventBus.log(`[${pluginName}]`, ...args),
-
+      statePasser: stateStore,
       // 状态访问
       getState: () => stateStore.getState(),
       get: (path, fallback) => stateStore.get(path, fallback),
@@ -188,7 +273,7 @@ class PluginManager extends EventEmitter {
       on: (event, callback) => eventBus.on(event, callback),
       once: (event, callback) => eventBus.once(event, callback),
       off: (event, callback) => eventBus.off?.(event, callback),
-
+      handlersPasser:stateMachine,
       // 注册自定义意图处理
       registerIntent: (intent, handler) => {
         stateMachine.registerHandler(intent, handler);

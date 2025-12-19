@@ -1,0 +1,26 @@
+<!-- ui.html -->
+<div id="test_plugin_ui_root" style="padding: 20px; color: #fff; background: #333; border-radius: 5px;">
+    <h3>欢迎使用 TestPlugin UI 界面</h3>
+    <p>这个内容是通过后端 JS 读取并注入到前端 div 中的。</p>
+    <label>测试配置保存:</label>
+    <input type="text" id="test_config_input" style="background: #444; border: 1px solid #555; color: #fff;">
+    <button onclick="saveTestConfig()">保存配置</button>
+    <p id="status_msg" style="color: green;"></p>
+</div>
+
+<!-- 这是一个模拟的前端交互脚本（实际需要通过你的 EventBus 或 IPCBridge 实现） -->
+<script>
+    function saveTestConfig() {
+        const input = document.getElementById('test_config_input');
+        const status = document.getElementById('status_msg');
+        status.textContent = '尝试保存... (需要前端 IPC 实现)';
+        
+        // 实际上这里需要你前端的 IPC 桥接代码来调用后端的 registerIntent("save_plugin_settings")
+        console.log("模拟保存配置:", input.value);
+    }
+    
+    // 初始化回显配置（假设前端加载完 UI 后会调用这个函数）
+    function loadConfig(config) {
+        document.getElementById('test_config_input').value = config.message || '无配置';
+    }
+</script>

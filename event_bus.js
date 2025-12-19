@@ -11,11 +11,18 @@ class EventBus extends EventEmitter {
   bindWindow(win) {
     this.win = win;
   }
-  log(content) {
-    // 这里的 { msg: content } 就会生成前端需要的格式
-    // 例如：eventBus.log("hello") -> 发送的是 { msg: "hello" }
+  // 修改 EventBus 里的 log 方法
+  log(...args) {
+    const content = args.map(arg => {
+        if (arg instanceof Error) return arg.stack; // 打印堆栈
+        if (typeof arg === 'object') return JSON.stringify(arg);
+        return arg;
+    }).join(' ');
+    
     this.emit("log", { msg: content });
-  }
+}
+
+
   // 重写或扩展 emit 方法
   emit(eventName, payload = {}) {
     // 1. 调用父类方法：触发后端内部监听器（如插件绑定的 api.on）

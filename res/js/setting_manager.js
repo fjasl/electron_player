@@ -8,12 +8,17 @@ class SettingManager {
       wrenchBtn: document.getElementById("wrench_btn"),
       logBtn: document.getElementById("log_btn"),
       infoBtn: document.getElementById("info_btn"),
+      plugBox: document.getElementById("setting_plug_box"), // 插件容器
+      wrenchViewIframe: document.querySelector("#wrench_view iframe"),
     };
     this.frame = document.getElementById("setting_view_frame");
     // 获取日志输出文本框
     this.logOutput = document.getElementById("logOutput");
     // 最大日志条目数限制
     this.MAX_LOG_ENTRIES = 50;
+
+    this.plugItems = [];
+    this.activePlugName = null;
 
     // 映射关系
     this.navMap = [
@@ -28,9 +33,11 @@ class SettingManager {
       clickWrench: null,
       clickLog: null,
       clickInfo: null,
+      onPlugSelected: null, // 当插件 item 被点击时的回调
     };
 
     this.init();
+    this.setupIframeCommunication();
   }
 
   init() {
@@ -78,6 +85,60 @@ class SettingManager {
       }
     });
   }
+  /**
+   * 动态添加插件 Item
+   * @param {string} name 插件名称
+   * @param {string} iconClass 图标类名 (FontAwesome)
+   */
+  addPlugItem(name, iconClass = "fa-solid fa-code") {
+    if (!this.dom.plugBox) return;
+
+    const item = document.createElement("div");
+    item.className = "setting_plug_item"; // 使用你定义的样式
+    item.dataset.name = name; // 存入标识符
+    item.title = name;
+    item.innerHTML = `
+      <div class="plug_item_icon"><i class="${iconClass}"></i></div>
+      <div class="plug_item_name">${name}</div>
+    `;
+
+    // 绑定点击事件
+    item.addEventListener("click", () => {
+      this.selectPlug(name);
+    });
+
+    this.dom.plugBox.appendChild(item);
+    this.plugItems.push({ name, dom: item });
+
+    // 默认选中第一个添加的插件
+    if (this.plugItems.length === 1) {
+      this.selectPlug(name);
+    }
+  }
+
+  /**
+   * 选中某个插件 Item
+   * @param {string} name 插件名称
+   */
+  selectPlug(name) {
+    this.activePlugName = name;
+
+    // 更新 UI 样式
+    this.plugItems.forEach((item) => {
+      if (item.name === name) {
+        item.dom.classList.add("plug_item_active");
+      } else {
+        item.dom.classList.remove("plug_item_active");
+      }
+    });
+
+    this.addLog(`已选中插件: ${name}`);
+
+    // 执行外部回调（用于通知其他模块切换维护页内容等）
+    if (this.callbacks.onPlugSelected) {
+      this.callbacks.onPlugSelected(name);
+    }
+  }
 
   /**
    * [新增方法] 格式化并添加日志到文本区域，并进行滚动和条数限制
@@ -107,7 +168,29 @@ class SettingManager {
     // 自动滚动到底部
     this.logOutput.scrollTop = this.logOutput.scrollHeight;
   }
+  /**
+   * [新增方法] 接收 HTML 字符串并渲染到 wrench_view 的 iframe 中
+   * @param {string} htmlString 要渲染的 HTML 内容
+   */
+  renderWrenchViewUI(htmlString) {
+    if (!this.dom.wrenchViewIframe) {
+      console.error("无法找到 wrench_view 中的 iframe 元素。");
+      return;
+    }
+    this.dom.wrenchViewIframe.srcdoc = htmlString;
+  }
+  setupIframeCommunication() {
+    window.addEventListener("message", (event) => {
+      if (event.data && event.data.source === "iframe-plugin-api") {
+        const { intent, payload } = event.data;
 
+        // 打印日志，方便调试
+        this.addLog(`主窗口收到来自 iframe 的意图: ${intent}`);
+        sendIntent("server_plugin_port", { port: payload });
+        console.log(`Intent: ${intent}, Payload:`, payload);
+      }
+    });
+  }
   /**
    * [新增私有方法] 限制日志条目为50条
    */

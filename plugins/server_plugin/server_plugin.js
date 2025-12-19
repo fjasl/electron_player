@@ -5,22 +5,27 @@ const websocket = require("@fastify/websocket");
 class ServerPlugin {
   constructor() {
     this.name = "ServerPlugin";
+
     this.port = 3000;
   }
 
   async activate(api) {
     this.api = api;
     this.server = fastify();
+    this.port = this.api.statePasser.getPluginByName(this.name).port;
+    this.api.log(this.port);
+    this.api.on("server_plugin_port", (data) => {
+      this.api.log(`接收到 'server_plugin_port' 意图，数据:`, data);
+    });
 
-    this.server.addHook("onError", async (request, reply, error) => {
-      api.error("Fastify request error:", error);
+    this.api.registerIntent("server_plugin_port", (payload, ctx) => {
+      const { stateStore, storage, eventBus } = ctx;
+      stateStore.upsertPlugin({ name: this.name, port: payload?.port });
+      storage.saveState(stateStore.getState());
+      this.api.log("成功保存");
     });
 
     // >>>>> 添加 Fastify CORS 插件 <<<<<
-    await this.server.register(require("@fastify/cors"), {
-      origin: "http://127.0.0.1:5500", // 明确允许你的测试页面源
-      methods: ["GET", "POST"],
-    });
 
     // 1. 注册基础支持
     await this.server.register(websocket);
@@ -77,15 +82,15 @@ class ServerPlugin {
       });
 
       // >>>>> 添加这两个监听器来调试 <<<<<
-    //   connection.socket.on("close", (code, reason) => {
-    //     this.api.log(`WS 连接关闭。代码: ${code}, 原因: ${reason.toString()}`);
-    //   });
+      //   connection.socket.on("close", (code, reason) => {
+      //     this.api.log(`WS 连接关闭。代码: ${code}, 原因: ${reason.toString()}`);
+      //   });
       connection.on("close", (code, reason) => {
         this.api.log(`WS 连接关闭。代码: ${code}, 原因: ${reason.toString()}`);
       });
-    //   connection.socket.on("error", (error) => {
-    //     this.api.error(`WS 连接错误:`, error.message);
-    //   });
+      //   connection.socket.on("error", (error) => {
+      //     this.api.error(`WS 连接错误:`, error.message);
+      //   });
       connection.on("error", (error) => {
         this.api.error(`WS 连接错误:`, error.message);
       });
@@ -130,7 +135,7 @@ class ServerPlugin {
   broadcastAudio(buffer) {
     // 性能优化：检查服务器和客户端是否存在
     if (!this.server?.websocketServer) {
-        return;
+      return;
     }
     const clients = this.server.websocketServer.clients;
     if (clients.size === 0) return;

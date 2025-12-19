@@ -44,6 +44,7 @@ audioManager.callbacks.onEnded = () => {
   sendIntent("play_next", {});
 };
 
+
 // ============== 播放界面 → AudioManager / 后端意图 ==============
 
 // 播放/暂停：只控制 <audio>，后端通过 audio 事件感知
@@ -176,6 +177,12 @@ mediaControl.callbacks.onPrev = () => {
   //console.log("[frontend] 上一曲");
   sendIntent("play_prev", {});
 };
+
+//=================setting_view=================
+settingManager.callbacks.onPlugSelected=(name) =>{
+  sendIntent("plugin_ui_request",{name:name});
+}
+
 // 监听后端 EventBus 发来的事件
 ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
   // //console.log("[frontend] backend-event:", name, payload);
@@ -275,5 +282,11 @@ ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
 
   if (name === "log"){
     settingManager.addLog(payload?.msg);
+  }
+  if (name === "plugin_loaded"){
+    settingManager.addPlugItem(payload?.name);
+  }
+  if (name === "plugin_ui_reply"){
+    settingManager.renderWrenchViewUI(payload?.html);
   }
 });
