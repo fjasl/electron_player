@@ -2,9 +2,10 @@
 const fs = require("fs");
 const path = require("path");
 const EventEmitter = require("events");
+const {app} = require("electron");
 
 class PluginManager extends EventEmitter {
-  constructor(pluginDir = path.join(process.cwd(), "plugins")) {
+  constructor(pluginDir = path.join(app.getAppPath(), "plugins")) {
     super();
     this.pluginDir = pluginDir;
     this.plugins = new Map(); // name -> { instance, module, watcher, enabled }
@@ -45,7 +46,7 @@ class PluginManager extends EventEmitter {
     );
   }
 
-  // 加载单个插件
+  加载单个插件
   loadPlugin(filename) {
     const filePath = path.join(this.pluginDir, filename);
 
@@ -128,6 +129,8 @@ class PluginManager extends EventEmitter {
       );
     }
   }
+
+ 
 
   // 重载插件（热重载核心）
   reloadPlugin(name) {
