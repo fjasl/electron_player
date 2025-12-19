@@ -13,7 +13,7 @@
   line-height: 1;
   width: 1.25em;
   text-align: center;
-  color: white;
+  color: inherit;
 }
 .navigation_bar {
   width: 35%;

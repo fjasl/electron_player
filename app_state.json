@@ -150,12 +150,12 @@
         "text": "You’re a wanderer just like me"
       }
     ],
-    "currentLyricRow": 11
+    "currentLyricRow": 0
   },
   "current_track": {
     "index": 2,
     "path": "D:\\songs\\nevada.mp3",
-    "position": 59.403112,
+    "position": 0,
     "duration": 208.58775510204083,
     "title": "Nevada",
     "artist": "Vicetone",
@@ -165,10 +165,10 @@
   },
   "is_playing": true,
   "play_mode": "shuffle",
-  "volume": 0.15013122884172017,
+  "volume": 0.8124575019540027,
   "last_session": {
     "path": "D:\\songs\\nevada.mp3",
-    "position": 59.403112,
+    "position": 0,
     "play_mode": "shuffle",
     "lyric_bind": "D:\\songs\\nevada.lrc"
   },
