@@ -67,18 +67,6 @@ class ServerPlugin {
 
     // 3. WebSocket 接口 (保持在根或指定路径)
     this.server.get("/ws", { websocket: true }, (connection, req) => {
-    //   connection.socket.send(
-    //     //JSON.stringify({ type: "init", payload: this.api.getState() })
-    //   );
-
-    //   connection.socket.on("message", (message) => {
-    //     try {
-    //       const { intent, payload } = JSON.parse(message.toString());
-    //       this.api.dispatch(intent, payload);
-    //     } catch (e) {
-    //       this.api.error("WS 消息解析错误");
-    //     }
-    //   });
       connection.on("message", (message) => {
         try {
           const { intent, payload } = JSON.parse(message.toString());
@@ -159,7 +147,7 @@ class ServerPlugin {
   async deactivate() {
     if (this.server) {
       await this.server.close();
-      this.api.log("ServerPlugin 已卸载并释放端口");
+      this.api.log("ServerPlugin已卸载并释放端口");
     }
   }
 }

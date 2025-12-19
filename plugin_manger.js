@@ -2,7 +2,10 @@
 const fs = require("fs");
 const path = require("path");
 const EventEmitter = require("events");
-const {app} = require("electron");
+const { app } = require("electron");
+
+// >>>>> 添加此行以判断当前环境是否为开发/未打包模式 <<<<<
+const isDevelopment = process.env.NODE_ENV === 'development' || !app.isPackaged;
 
 class PluginManager extends EventEmitter {
   constructor(pluginDir = path.join(app.getAppPath(), "plugins")) {
@@ -46,7 +49,7 @@ class PluginManager extends EventEmitter {
     );
   }
 
-  加载单个插件
+  //加载单个插件;
   loadPlugin(filename) {
     const filePath = path.join(this.pluginDir, filename);
 
@@ -66,7 +69,6 @@ class PluginManager extends EventEmitter {
 
       // 支持 CommonJS 和 ES6 默认导出
       const PluginClass = PluginModule.default || PluginModule;
-
       if (typeof PluginClass !== "function") {
         this.deps.eventBus.log(
           `[PluginManager] ${filename} 未导出一个类，跳过`
@@ -75,7 +77,6 @@ class PluginManager extends EventEmitter {
       }
 
       const pluginInstance = new PluginClass();
-
       // 插件必须有 name 属性
       if (!pluginInstance.name || typeof pluginInstance.name !== "string") {
         this.deps.eventBus.log(
@@ -83,40 +84,39 @@ class PluginManager extends EventEmitter {
         );
         return;
       }
-
       const pluginName = pluginInstance.name;
 
       // 初始化插件，注入核心 API
       const api = this.createPluginAPI(pluginName);
-
       if (typeof pluginInstance.activate === "function") {
         pluginInstance.activate(api);
       } else if (typeof pluginInstance.init === "function") {
         pluginInstance.init(api); // 兼容旧写法
       }
 
-      // 设置文件监视（热重载）
-      const watcher = fs.watch(filePath, (eventType) => {
-        if (eventType === "change") {
-          this.deps.eventBus.log(
-            `[PluginManager] 检测到插件修改: ${filename}，正在热重载...`
-          );
-          this.reloadPlugin(pluginName);
-        }
-      });
-
+      // >>>>> 仅在开发环境设置文件监视 (热重载) <<<<<
+      let watcher = undefined;
+      if (isDevelopment) {
+        watcher = fs.watch(filePath, (eventType) => {
+          if (eventType === "change") {
+            this.deps.eventBus.log(
+              `[PluginManager] 检测到插件修改: ${filename}，正在热重载...`
+            );
+            this.reloadPlugin(pluginName);
+          }
+        });
+      }
       this.plugins.set(pluginName, {
         instance: pluginInstance,
         module: PluginModule,
         filePath,
         filename,
-        watcher,
+        watcher, // watcher 现在可能是 undefined
         enabled: true,
       });
       this.deps.eventBus.log(
         `[PluginManager] 插件加载成功: ${pluginName} (${filename})`
       );
-
       // 触发事件通知其他插件或系统
       this.emit("plugin-loaded", {
         name: pluginName,
@@ -127,10 +127,12 @@ class PluginManager extends EventEmitter {
         `[PluginManager] 加载插件失败 ${filename}:`,
         err.message
       );
+      this.deps.eventBus.log(
+        `[PluginManager] 加载插件失败 ${filename} Stack:`,
+        err.stack
+      );
     }
   }
-
- 
 
   // 重载插件（热重载核心）
   reloadPlugin(name) {
