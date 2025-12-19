@@ -31,9 +31,13 @@ async function initBackend(win) {
   registerPlaylistHandlers(stateMachine);
   registerPlaybackHandlers(stateMachine);
 
-  // pluginManager = new PluginManager();
-  // pluginManager.loadAll();
-  // module.exports.pluginManager = pluginManager;
+  pluginManager = new PluginManager();
+  pluginManager.injectDeps({
+    stateStore,
+    eventBus,
+    stateMachine,
+  });
+  module.exports.pluginManager = pluginManager;
 
   // 3. 建立前端 → 后端：通用意图入口
   ipcMain.on("frontend-intent", (_event, msg) => {
@@ -68,11 +72,17 @@ async function initBackend(win) {
         percent: VOLUME,
       });
     }
+
+    pluginManager.loadAll();
+    console.log("[Backend] 所有核心初始化完成，插件已加载");
   });
+
   return stateStore;
 }
 
 module.exports = {
   initBackend,
-  // get pluginManager() { return pluginManager; },
+  get pluginManager() {
+    return pluginManager;
+  },
 };
