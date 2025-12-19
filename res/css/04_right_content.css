@@ -33,7 +33,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-   min-width: 0;
+  min-width: 0;
 }
 #list_func {
   flex: 1;
@@ -54,18 +54,18 @@
   justify-content: start;
   align-items: center;
 
-  overflow-y: auto;   /* 关键：允许垂直滚动 */
+  overflow-y: auto; /* 关键：允许垂直滚动 */
   overflow-x: hidden; /* 只隐藏横向 */
 }
 #list_box::-webkit-scrollbar {
-  width: 5%;  /* 滚动条宽度 */
+  width: 5%; /* 滚动条宽度 */
 }
 #list_box::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0); /* 透明 */
 }
 
 #list_box::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.18); 
+  background: rgba(255, 255, 255, 0.18);
   border-radius: 10px;
 }
 
@@ -76,10 +76,10 @@
 /* Firefox */
 #list_box {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,0.18) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
 }
 
-#volume_bar_box{
+#volume_bar_box {
   width: 5%;
   height: 80%;
   position: absolute;
@@ -88,15 +88,15 @@
   z-index: 999;
 
   /* 可选：微弱呼吸感 */
-  transition: opacity .2s ease, transform .2s ease;
+  transition: opacity 0.2s ease, transform 0.2s ease;
 
-   /* 动画相关 */
+  /* 动画相关 */
   opacity: 0;
   transform: translateX(140%) scale(0.96);
   pointer-events: none;
 }
 
-#volume_bar_track{
+#volume_bar_track {
   width: 100%;
   height: 100%;
   border-radius: 999px;
@@ -105,16 +105,15 @@
   overflow: hidden;
 
   /* 深色磨砂轨道 */
-  background: rgba(255,255,255,0.08);
+  background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(6px);
 
   /* 轻微内阴影，更像系统控件 */
-  box-shadow:
-    inset 0 0 0 1px rgba(255,255,255,0.06),
-    inset 0 -8px 16px rgba(0,0,0,0.35);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+    inset 0 -8px 16px rgba(0, 0, 0, 0.35);
 }
 
-#volume_bar_fill{
+#volume_bar_fill {
   position: absolute;
   bottom: 0;
   left: 0;
@@ -125,60 +124,104 @@
   /* 推荐填充颜色（与你 UI 最搭） */
   background: linear-gradient(
     to top,
-    rgba(255,255,255,0.85),
-    rgba(255,255,255,0.55)
+    rgba(255, 255, 255, 0.85),
+    rgba(255, 255, 255, 0.55)
   );
 
   border-radius: 0;
 
   /* 动画：调音量时有“上升感” */
-  transition: height .18s ease-out;
+  transition: height 0.18s ease-out;
 }
 
 /* 显示状态 */
-#volume_bar_box.show{
+#volume_bar_box.show {
   pointer-events: auto;
   animation: vol_in 420ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
 
 /* 隐藏状态（出场） */
-#volume_bar_box.hide{
+#volume_bar_box.hide {
   pointer-events: none;
   animation: vol_out 320ms cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
 }
 
 /* 进场：带弹性（略微过冲再回到位） */
-@keyframes vol_in{
-  0%{
+@keyframes vol_in {
+  0% {
     opacity: 0;
     transform: translateX(140%) scale(0.96);
     filter: blur(6px);
   }
-  70%{
+  70% {
     opacity: 1;
     transform: translateX(-6%) scale(1.02); /* 过冲 */
     filter: blur(0px);
   }
-  100%{
+  100% {
     opacity: 1;
-    transform: translateX(0) scale(1);      /* 回弹到位 */
+    transform: translateX(0) scale(1); /* 回弹到位 */
     filter: blur(0px);
   }
 }
 
 /* 出场：轻微回拉一下再滑出去（有弹性感） */
-@keyframes vol_out{
-  0%{
+@keyframes vol_out {
+  0% {
     opacity: 1;
     transform: translateX(0) scale(1);
     filter: blur(0px);
   }
-  25%{
+  25% {
     transform: translateX(-4%) scale(1.01); /* 反向轻拉 */
   }
-  100%{
+  100% {
     opacity: 0;
     transform: translateX(140%) scale(0.96);
     filter: blur(6px);
   }
+}
+
+#setting_func {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+  align-items: center;
+  gap: 5%;
+}
+
+#setting_box {
+  flex: 9;
+  width: 100%;
+  height: 100%;
+  position: relative; /* 作为四个页面的定位参考 */
+  overflow: hidden; /* 只显示当前“视口” */
+}
+#setting_view_frame {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 400%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  /* 回弹动画 */
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform;
+}
+.setting_box_content {
+  position: relative;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 25%; /* 每个页面都是一个完整视口 */
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }

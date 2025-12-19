@@ -20,7 +20,11 @@ class PluginManager extends EventEmitter {
   ensurePluginDir() {
     if (!fs.existsSync(this.pluginDir)) {
       fs.mkdirSync(this.pluginDir, { recursive: true });
+      if (!this.deps) {
+        throw new Error(`[PluginManager] 核心依赖尚未注入，无法创建 API`);
+      }
       console.log(`[PluginManager] 创建插件目录: ${this.pluginDir}`);
+      this.deps.eventBus.log(`[PluginManager] 创建插件目录: ${this.pluginDir}`);
     }
   }
 
@@ -29,14 +33,16 @@ class PluginManager extends EventEmitter {
     const files = fs
       .readdirSync(this.pluginDir)
       .filter((file) => file.endsWith(".js"));
-
-    console.log(`[PluginManager] 发现 ${files.length} 个插件文件，正在加载...`);
-
+    this.deps.eventBus.log(
+      `[PluginManager] 发现 ${files.length} 个插件文件，正在加载...`
+    );
     for (const file of files) {
       this.loadPlugin(file);
     }
 
-    console.log(`[PluginManager] 所有插件加载完成，共 ${this.plugins.size} 个`);
+    this.deps.eventBus.log(
+      `[PluginManager] 所有插件加载完成，共 ${this.plugins.size} 个`
+    );
   }
 
   // 加载单个插件
@@ -61,7 +67,9 @@ class PluginManager extends EventEmitter {
       const PluginClass = PluginModule.default || PluginModule;
 
       if (typeof PluginClass !== "function") {
-        console.warn(`[PluginManager] ${filename} 未导出一个类，跳过`);
+        this.deps.eventBus.log(
+          `[PluginManager] ${filename} 未导出一个类，跳过`
+        );
         return;
       }
 
@@ -69,7 +77,9 @@ class PluginManager extends EventEmitter {
 
       // 插件必须有 name 属性
       if (!pluginInstance.name || typeof pluginInstance.name !== "string") {
-        console.warn(`[PluginManager] ${filename} 缺少 name 属性，跳过`);
+        this.deps.eventBus.log(
+          `[PluginManager] ${filename} 缺少 name 属性，跳过`
+        );
         return;
       }
 
@@ -87,7 +97,7 @@ class PluginManager extends EventEmitter {
       // 设置文件监视（热重载）
       const watcher = fs.watch(filePath, (eventType) => {
         if (eventType === "change") {
-          console.log(
+          this.deps.eventBus.log(
             `[PluginManager] 检测到插件修改: ${filename}，正在热重载...`
           );
           this.reloadPlugin(pluginName);
@@ -102,8 +112,9 @@ class PluginManager extends EventEmitter {
         watcher,
         enabled: true,
       });
-
-      console.log(`[PluginManager] 插件加载成功: ${pluginName} (${filename})`);
+      this.deps.eventBus.log(
+        `[PluginManager] 插件加载成功: ${pluginName} (${filename})`
+      );
 
       // 触发事件通知其他插件或系统
       this.emit("plugin-loaded", {
@@ -111,7 +122,10 @@ class PluginManager extends EventEmitter {
         instance: pluginInstance,
       });
     } catch (err) {
-      console.error(`[PluginManager] 加载插件失败 ${filename}:`, err.message);
+      this.deps.eventBus.log(
+        `[PluginManager] 加载插件失败 ${filename}:`,
+        err.message
+      );
     }
   }
 
@@ -120,7 +134,7 @@ class PluginManager extends EventEmitter {
     const info = this.plugins.get(name);
     if (!info) return false;
 
-    console.log(`[PluginManager] 正在重载插件: ${name}`);
+    this.deps.eventBus.log(`[PluginManager] 正在重载插件: ${name}`);
 
     // 先卸载
     this.unloadPlugin(name, false); // false 表示不关闭 watcher
@@ -145,11 +159,14 @@ class PluginManager extends EventEmitter {
       }
 
       this.plugins.delete(name);
-      console.log(`[PluginManager] 插件已卸载: ${name}`);
+      this.deps.eventBus.log(`[PluginManager] 插件已卸载: ${name}`);
       this.emit("plugin-unloaded", { name });
       return true;
     } catch (err) {
-      console.error(`[PluginManager] 卸载插件失败 ${name}:`, err.message);
+      this.deps.eventBus.log(
+        `[PluginManager] 卸载插件失败 ${name}:`,
+        err.message
+      );
       return false;
     }
   }
@@ -190,8 +207,8 @@ class PluginManager extends EventEmitter {
     const { stateStore, eventBus, stateMachine } = this.deps;
     return {
       name: pluginName,
-      log: (...args) => console.log(`[${pluginName}]`, ...args),
-      error: (...args) => console.error(`[${pluginName}]`, ...args),
+      log: (...args) => eventBus.log(`[${pluginName}]`, ...args),
+      error: (...args) => eventBus.log(`[${pluginName}]`, ...args),
 
       // 状态访问
       getState: () => stateStore.getState(),
@@ -205,7 +222,7 @@ class PluginManager extends EventEmitter {
       // 注册自定义意图
       registerIntent: (intent, handler) => {
         stateMachine.registerHandler(intent, handler);
-        console.log(`[${pluginName}] 注册意图: ${intent}`);
+        eventBus.log(`[${pluginName}] 注册意图: ${intent}`);
       },
 
       // 触发事件（插件间通信）

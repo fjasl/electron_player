@@ -1,0 +1,24 @@
+#log_box {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+#logOutput {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box; /* 确保 padding 不会增加宽度或高度 */
+  border: none; /* 移除默认边框 */
+  background-color: transparent;
+  color: #f1f1f1; /* 白色文本 */
+  font-family: "SourceHanSansSC", sans-serif; /* 使用您的自定义字体 */
+  font-size: 14px; /* 设置字体大小 */
+  resize: none; /* 防止用户手动调整大小 */
+  outline: none; /* 移除点击时的轮廓 */
+  line-height: 1.4;
+  cursor: default; /* 只读状态下保持默认光标 */
+}
+#logOutput::-webkit-scrollbar {
+  display: none; /* 核心规则：完全隐藏滚动条元素 */
+  width: 0; /* 确保不占用任何空间 */
+  height: 0;
+}

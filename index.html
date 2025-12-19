@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="res/css/04_left_guide_func.css" />
     <link rel="stylesheet" href="res/css/04_right_content.css" />
     <link rel="stylesheet" href="res/css/04_right_lyric.css" />
+    <link rel="stylesheet" href="res/css/05_right_setting_field.css" />
     <link rel="stylesheet" href="res/css/05_right_content.css" />
     <link rel="stylesheet" href="res/css/06_right_widgets.css" />
     <link rel="stylesheet" href="res/css/06_right_list_field.css" />
@@ -143,7 +144,35 @@
             <div id="list_box"></div>
           </div>
           <div id="content_setting" class="tab_content">
-            设置界面内容（占位）
+            <div id="setting_func">
+              <div id="plug_btn" class="setting_func_box">
+                <i class="fa-solid fa-code"></i>
+              </div>
+              <div id="wrench_btn" class="setting_func_box">
+                <i class="fa-solid fa-wrench"></i>
+              </div>
+              <div id="log_btn" class="setting_func_box">
+                <i class="fas fa-book"></i>
+              </div>
+              <div id="info_btn" class="setting_func_box">
+                <i class="fa-solid fa-info"></i>
+              </div>
+            </div>
+            <div id="setting_box">
+              <div id="setting_view_frame">
+                <div id="plug_view" class="setting_box_content">插件</div>
+                <div id="wrench_view" class="setting_box_content">维护</div>
+                <div id="log_view" class="setting_box_content">
+                  <div id="log_box">
+                    <textarea
+                      id="logOutput"
+                      readonly
+                    ></textarea>
+                  </div>
+                </div>
+                <div id="info_view" class="setting_box_content">信息</div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -158,6 +187,7 @@
     <script src="res/js/disco_manager.js"></script>
     <script src="res/js/mediainfo_unit.js"></script>
     <script src="res/js/lyric_manager.js"></script>
+    <script src="res/js/setting_manager.js"></script>
     <script src="res/js/main.js"></script>
   </body>
 </html>

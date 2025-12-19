@@ -50,7 +50,6 @@ async function initBackend(win) {
   // 【新添加位置】：高频音频数据转发
   // ==========================================
   ipcMain.on("audio-data", (_event, buffer) => {
-    // console.log("收到音频数据长度:", buffer.length);
     // 通过 module.exports 访问是为了确保引用的是当前正在运行的实例
     const serverPlugin = pluginManager.getPlugin("ServerPlugin");
 
@@ -88,7 +87,7 @@ async function initBackend(win) {
     }
 
     pluginManager.loadAll();
-    console.log("[Backend] 所有核心初始化完成，插件已加载");
+    eventBus.emit("log",{msg:"[Backend] 所有核心初始化完成，插件已加载",})
   });
 
   return stateStore;

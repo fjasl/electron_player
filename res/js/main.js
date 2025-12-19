@@ -19,6 +19,8 @@ const mediaControl = new MediaControl();
 
 const lyricManager = new LyricManager();
 
+const settingManager = new SettingManager();
+
 // 记录当前 audio 正在播放的那一首（用后端的 track.path）
 let currentAudioTrackPath = null;
 
@@ -269,5 +271,9 @@ ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
   if (name === "volume_changed") {
     playUI.setVolume(payload?.percent);
     audioManager.setVolume(payload?.percent);
+  }
+
+  if (name === "log"){
+    settingManager.addLog(payload?.msg);
   }
 });
