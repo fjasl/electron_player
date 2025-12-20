@@ -4,33 +4,28 @@ const path = require("path");
 const EventEmitter = require("events");
 const { app } = require("electron");
 const { handlers } = require("./state_machine");
+const storage = require("./units/storage");
 
 class PluginManager extends EventEmitter {
-  constructor() {
+  constructor(deps) {
     super();
     const appPath = app.getAppPath();
-    const joinedPath = path.resolve(appPath, '../../'); 
-    this.pluginDir = path.join(joinedPath,"plugins");
+    const joinedPath = path.resolve(appPath, "../../");
+    this.pluginDir = path.join(joinedPath, "plugins");
     this.plugins = new Map(); // name -> { instance, module, enabled }
-    this.deps = null;
-    this.ensurePluginDir();
+    this.deps = deps;
     this.Pluglist = []; // 存储扫描到的插件元数据
+    this.deps.eventBus.log("[PluginManager] 插件管理器初始化完成");
   }
 
-  injectDeps(deps) {
-    this.deps = deps;
-  }
 
   // 确保 plugins 目录存在
   ensurePluginDir() {
+    this.deps.eventBus.log("[PluginManager] 审查插件目录是否存在");
     if (!fs.existsSync(this.pluginDir)) {
-      fs.mkdirSync(this.pluginDir, { recursive: true });
-      if (!this.deps) {
-        throw new Error(`[PluginManager] 核心依赖尚未注入，无法创建 API`);
-      }
       this.deps.eventBus.log(`[PluginManager] 创建插件目录: ${this.pluginDir}`);
+      fs.mkdirSync(this.pluginDir, { recursive: true });
     }
-    
   }
 
   // 加载所有插件 (修改版：支持二级目录检测)
@@ -106,14 +101,11 @@ class PluginManager extends EventEmitter {
     // 从 this.Pluglist 中查找对应的元数据
     const pluginMeta = this.Pluglist.find((meta) => {
       // 使用 path 模块获取文件名，并移除扩展名
-      const fileName = path.basename(
-        meta.plugpath
-      );
-      if (fileName === pluginName){
+      const fileName = path.basename(meta.plugpath);
+      if (fileName === pluginName) {
         return meta.plugUI;
       }
       // 将文件名与请求的名称进行比较
-      
     });
     if (pluginMeta && pluginMeta.plugUI) {
       try {
@@ -262,10 +254,11 @@ class PluginManager extends EventEmitter {
     if (!this.deps) {
       throw new Error(`[PluginManager] 核心依赖尚未注入，无法创建 API`);
     }
-    const { stateStore, eventBus, stateMachine } = this.deps;
+    const { stateStore, eventBus, stateMachine,storage } = this.deps;
     return {
       name: pluginName,
-      eventPasser:eventBus,
+      storagePasser:storage,
+      eventPasser: eventBus,
       log: (...args) => eventBus.log(`[${pluginName}]`, ...args),
       error: (...args) => eventBus.log(`[${pluginName}]`, ...args),
       statePasser: stateStore,
@@ -277,7 +270,7 @@ class PluginManager extends EventEmitter {
       on: (event, callback) => eventBus.on(event, callback),
       once: (event, callback) => eventBus.once(event, callback),
       off: (event, callback) => eventBus.off?.(event, callback),
-      handlersPasser:stateMachine,
+      handlersPasser: stateMachine,
       // 注册自定义意图处理
       registerIntent: (intent, handler) => {
         stateMachine.registerHandler(intent, handler);

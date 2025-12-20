@@ -16,7 +16,11 @@ class ServerPlugin {
       this.port = this.api.statePasser.getPluginByName(this.name).port;
     }
     catch(e){
-      this.api.log("如果是第一次打开请忽略这个报错"+e);
+      this.api.log("没有找到指定端口 默认创建3000作为端口"+e);
+      this.api.statePasser.upsertPlugin({ name: this.name, port: payload?.port });
+      this.api.storagePasser.saveState(this.api.statePasser.getState());
+      this.api.log("端口成功保存");
+
     }
     this.api.log("服务器在"+this.port+"端口启动");
     this.api.on("server_plugin_port", (data) => {
@@ -24,10 +28,9 @@ class ServerPlugin {
     });
 
     this.api.registerIntent("server_plugin_port", (payload, ctx) => {
-      const { stateStore, storage, eventBus } = ctx;
-      stateStore.upsertPlugin({ name: this.name, port: payload?.port });
-      storage.saveState(stateStore.getState());
-      this.api.log("成功保存");
+      this.api.statePasser.upsertPlugin({ name: this.name, port: payload?.port });
+      this.api.storagePasser.saveState(this.api.statePasser.getState());
+      this.api.log("端口成功保存");
     });
 
     // >>>>> 添加 Fastify CORS 插件 <<<<<

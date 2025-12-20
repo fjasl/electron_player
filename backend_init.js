@@ -30,15 +30,20 @@ async function initBackend(win) {
   // 2. 注册各类 intent -> handler
   registerPlaylistHandlers(stateMachine);
   registerPlaybackHandlers(stateMachine);
-
-  pluginManager = new PluginManager();
-  pluginManager.injectDeps({
+  pluginManager = new PluginManager({
     stateStore,
     eventBus,
     stateMachine,
+    storage,
   });
   pluginManager.registerUIRequestIntent();
   module.exports.pluginManager = pluginManager;
+  // pluginManager.injectDeps({
+  //   stateStore,
+  //   eventBus,
+  //   stateMachine,
+  // });
+  // pluginManager.ensurePluginDir();
 
   // 3. 建立前端 → 后端：通用意图入口
   ipcMain.on("frontend-intent", (_event, msg) => {
@@ -86,6 +91,8 @@ async function initBackend(win) {
         percent: VOLUME,
       });
     }
+
+    pluginManager.ensurePluginDir();
     eventBus.emit("log", { msg: "[Backend] 准备开始加载插件" });
     pluginManager.loadAll();
     eventBus.emit("log", { msg: "[Backend] 所有核心初始化完成，插件已加载" });

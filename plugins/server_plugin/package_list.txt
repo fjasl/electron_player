@@ -1,0 +1,4 @@
+@fastify/cors
+@fastify/websocket
+fastify
+ws
