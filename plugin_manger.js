@@ -6,9 +6,11 @@ const { app } = require("electron");
 const { handlers } = require("./state_machine");
 
 class PluginManager extends EventEmitter {
-  constructor(pluginDir = path.join(app.getAppPath(), "plugins")) {
+  constructor() {
     super();
-    this.pluginDir = pluginDir;
+    const appPath = app.getAppPath();
+    const joinedPath = path.resolve(appPath, '../../'); 
+    this.pluginDir = path.join(joinedPath,"plugins");
     this.plugins = new Map(); // name -> { instance, module, enabled }
     this.deps = null;
     this.ensurePluginDir();
@@ -28,10 +30,12 @@ class PluginManager extends EventEmitter {
       }
       this.deps.eventBus.log(`[PluginManager] 创建插件目录: ${this.pluginDir}`);
     }
+    
   }
 
   // 加载所有插件 (修改版：支持二级目录检测)
   loadAll() {
+    this.deps.eventBus.log(this.pluginDir);
     this.Pluglist = [];
     const entries = fs.readdirSync(this.pluginDir, { withFileTypes: true });
 

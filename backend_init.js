@@ -86,9 +86,9 @@ async function initBackend(win) {
         percent: VOLUME,
       });
     }
-
+    eventBus.emit("log", { msg: "[Backend] 准备开始加载插件" });
     pluginManager.loadAll();
-    eventBus.emit("log",{msg:"[Backend] 所有核心初始化完成，插件已加载",})
+    eventBus.emit("log", { msg: "[Backend] 所有核心初始化完成，插件已加载" });
   });
 
   return stateStore;

@@ -1,10 +1,6 @@
 {
   "dependencies": {
-    "@fastify/cors": "^11.2.0",
-    "@fastify/websocket": "^11.2.0",
-    "fastify": "^5.6.2",
-    "music-metadata": "^11.10.3",
-    "ws": "^8.18.3"
+    "music-metadata": "^11.10.3"
   },
   "name": "player",
   "version": "1.0.0",
@@ -31,14 +27,38 @@
     "files": [
       "**/*",
       "!app_state.json",
-      "!.gitignore"
+      "!.gitignore",
+      "!plugins/**/*",
+      "!dependencies.txt",
+      "!install_plugins.ps1",
+      "!startInstallPlugins.bat",
+      "!.gitignore",
+      "!versionReadme/*",
+      "!package,json",
+      "!package-lock,json"
+    ],
+    "extraFiles": [
+      {
+        "from": "nodeP",
+        "to": "nodeP",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "install_plugins.ps1",
+        "to": "install_plugins.ps1"
+      },
+      {
+        "from":"startInstallPlugins.bat",
+        "to":"startInstallPlugins.bat"
+      }
     ],
     "directories": {
       "output": "dist"
     },
     "win": {
-      "target": "nsis",
-      "icon": "icon.ico"
+      "target": "zip"
     }
   },
   "license": "ISC"

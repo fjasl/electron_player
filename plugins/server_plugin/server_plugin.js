@@ -12,8 +12,13 @@ class ServerPlugin {
   async activate(api) {
     this.api = api;
     this.server = fastify();
-    this.port = this.api.statePasser.getPluginByName(this.name).port;
-    this.api.log(this.port);
+    try{
+      this.port = this.api.statePasser.getPluginByName(this.name).port;
+    }
+    catch(e){
+      this.api.log("如果是第一次打开请忽略这个报错"+e);
+    }
+    this.api.log("服务器在"+this.port+"端口启动");
     this.api.on("server_plugin_port", (data) => {
       this.api.log(`接收到 'server_plugin_port' 意图，数据:`, data);
     });

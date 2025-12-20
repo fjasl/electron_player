@@ -94,10 +94,10 @@ function createTray() {
 }
 
 app.whenReady().then(async () => {
-  
+  // 获取 asar 文件的父目录路径 (即 win-unpacked 目录)
   createWindow();
   createTray();
-  stateStoreInstance =await initBackend(win);
+  stateStoreInstance = await initBackend(win);
 });
 
 // app.on("window-all-closed", () => {
