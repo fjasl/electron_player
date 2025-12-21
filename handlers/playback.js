@@ -263,7 +263,8 @@ async function handleCoverrequest(_payload, ctx) {
 
 function handleVolumeChange(_payload, ctx) {
   const { stateStore, storage, eventBus } = ctx;
-  stateStore.state.volume = _payload.percent;
+  // stateStore.state.volume = _payload.percent;
+  stateStore.setVolume(_payload.percent);
   eventBus.emit("volume_changed", {
     percent: stateStore.get("volume"),
   });

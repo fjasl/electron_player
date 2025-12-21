@@ -12,23 +12,27 @@ class ServerPlugin {
   async activate(api) {
     this.api = api;
     this.server = fastify();
-    try{
+    try {
       this.port = this.api.statePasser.getPluginByName(this.name).port;
-    }
-    catch(e){
-      this.api.log("没有找到指定端口 默认创建3000作为端口"+e);
-      this.api.statePasser.upsertPlugin({ name: this.name, port: payload?.port });
+    } catch (e) {
+      this.api.log("没有找到指定端口 默认创建3000作为端口" + e);
+      this.api.statePasser.upsertPlugin({
+        name: this.name,
+        port: payload?.port,
+      });
       this.api.storagePasser.saveState(this.api.statePasser.getState());
       this.api.log("端口成功保存");
-
     }
-    this.api.log("服务器在"+this.port+"端口启动");
+    this.api.log("服务器在" + this.port + "端口启动");
     this.api.on("server_plugin_port", (data) => {
       this.api.log(`接收到 'server_plugin_port' 意图，数据:`, data);
     });
 
     this.api.registerIntent("server_plugin_port", (payload, ctx) => {
-      this.api.statePasser.upsertPlugin({ name: this.name, port: payload?.port });
+      this.api.statePasser.upsertPlugin({
+        name: this.name,
+        port: payload?.port,
+      });
       this.api.storagePasser.saveState(this.api.statePasser.getState());
       this.api.log("端口成功保存");
     });
@@ -46,11 +50,104 @@ class ServerPlugin {
           return this.api.getState();
         });
 
-        // 发送播放意图: POST /api/player/intent
-        instance.post("/intent", async (req, reply) => {
-          const { intent, payload } = req.body;
-          this.api.dispatch(intent, payload);
+        instance.post("/play", async (req, reply) => {
+          this.api.statePasser.setPlaying(true);
+          this.api.statePasser.snapshotLastSession();
+          this.api.storagePasser.saveState(this.api.statePasser.getState());
+
+          this.api.eventPasser.emit("play_state_changed", {
+            is_playing: this.api.statePasser.get("is_playing"),
+          });
           return { status: "ok" };
+        });
+        instance.post("/pause", async (req, reply) => {
+          this.api.statePasser.setPlaying(false);
+          this.api.statePasser.snapshotLastSession();
+          this.api.storagePasser.saveState(this.api.statePasser.getState());
+
+          this.api.eventPasser.emit("play_state_changed", {
+            is_playing: this.api.statePasser.get("is_playing"),
+          });
+          return { status: "ok" };
+        });
+        instance.post("/next", async () => {
+          this.api.handlersPasser.dispatch("play_next", {});
+          return { status: "ok" };
+        });
+
+        instance.post("/prev", async () => {
+          this.api.handlersPasser.dispatch("play_prev", {});
+          return { status: "ok" };
+        });
+        instance.post("/play_at", async (req, reply) => {
+          const { index } = req.body || {};
+          const songList = this.api.statePasser.get("playlist");
+          const total = songList.length;
+
+          if (typeof index !== "number" || index < 0 || index >= total) {
+            reply.code(400);
+            return {
+              status: "error",
+              message: `索引越界。当前列表长度为 ${total}，你发送的索引是 ${index}`,
+            };
+          }
+          this.api.handlersPasser.dispatch("play_list_track", { index });
+          return {
+            status: "ok",
+            msg: "开始播放第" + (index + 1).toString() + "首",
+          };
+        });
+        instance.post("/seek", async (req, reply) => {
+          const { percent } = req.body || {};
+          if (typeof percent !== "number" || percent < 0 || percent > 1) {
+            reply.code(400);
+            return {
+              error: "Invalid percent. Must be a number between 0 and 1.",
+            };
+          }
+          this.api.handlersPasser.dispatch("seek", { percent });
+
+          return { status: "ok", seek_to: percent };
+        });
+        instance.post("/set_mode", async (req, reply) => {
+          const { mode } = req.body || {};
+          if (mode === "single_loop") {
+            this.api.statePasser.setPlayMode("single_loop");
+          } else if (mode === "shuffle") {
+            this.api.statePasser.setPlayMode("shuffle");
+          } else {
+            return {
+              status: "error",
+              message: `不支持的模式: '${mode}'。可选模式: "single_loop", "shuffle"`,
+            };
+          }
+          this.api.statePasser.snapshotLastSession();
+          this.api.storagePasser.saveState(this.api.statePasser.getState());
+
+          this.api.eventPasser.emit("play_mode_changed", {
+            play_mode: this.api.statePasser.get("play_mode"),
+          });
+          return { status: "ok", current_mode: mode };
+        });
+        instance.post("/set_volume", async (req, reply) => {
+          const { percent } = req.body || {};
+
+          // 1. 校验音量值是否为 0~1 的数字
+          if (typeof percent !== "number" || percent < 0 || percent > 1) {
+            reply.code(400);
+            return {
+              status: "error",
+              message: "音量百分比必须是 0 到 1 之间的数字 (例如 0.5 表示 50%)",
+            };
+          }
+          this.api.statePasser.setVolume(percent);
+          this.api.eventPasser.emit("volume_changed", {
+            percent: this.api.statePasser.get("volume"),
+          });
+          return {
+            status: "ok",
+            current_volume: percent,
+          };
         });
       },
       { prefix: "/api/player" }
