@@ -249,8 +249,11 @@ class ServerPlugin {
     this.server.register(
       async (instance) => {
         // 获取当前歌词: GET /api/lyric/current
-        instance.get("/current", async () => {
+        instance.get("/current_lyriclist", async () => {
           return this.api.get("Lyric.LyricList", []);
+        });
+        instance.get("/current_lyricindex", async () => {
+          return this.api.statePasser.get("Lyric.currentLyricRow");
         });
       },
       { prefix: "/api/lyric" }

@@ -52,4 +52,6 @@ V4.0.1 将seek行为也添加到链路中
 |                  player 完善 /api/player/*         
 |                       |
 |                  playlist 完善 /api/playlist/*
-|               
+|                       |
+|                  lyric 完善 /api/lyric/*
+|
