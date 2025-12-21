@@ -1,6 +1,8 @@
 // plugins/server_plugin.js
 const fastify = require("fastify");
 const websocket = require("@fastify/websocket");
+const fs = require("fs");
+const pathModule = require("path"); // 重命名模块以防冲突
 
 class ServerPlugin {
   constructor() {
@@ -46,7 +48,7 @@ class ServerPlugin {
     this.server.register(
       async (instance) => {
         // 获取播放状态: GET /api/player/state
-        instance.get("/state", async () => {
+        instance.get("/get_state", async () => {
           return this.api.getState();
         });
 
@@ -70,18 +72,18 @@ class ServerPlugin {
           });
           return { status: "ok" };
         });
-        instance.post("/next", async () => {
+        instance.post("/play_next", async () => {
           this.api.handlersPasser.dispatch("play_next", {});
           return { status: "ok" };
         });
 
-        instance.post("/prev", async () => {
+        instance.post("/play_prev", async () => {
           this.api.handlersPasser.dispatch("play_prev", {});
           return { status: "ok" };
         });
         instance.post("/play_at", async (req, reply) => {
           const { index } = req.body || {};
-          const songList = this.api.statePasser.get("playlist");
+          const songList = this.api.statePasser.get("playlist") || [];
           const total = songList.length;
 
           if (typeof index !== "number" || index < 0 || index >= total) {
@@ -159,6 +161,85 @@ class ServerPlugin {
         // 获取列表: GET /api/playlist/all
         instance.get("/all", async () => {
           return this.api.get("playlist", []);
+        });
+        instance.post("/del_track", async (req, reply) => {
+          const { index } = req.body || {};
+          const songList = this.api.statePasser.get("playlist") || [];
+          const total = songList.length;
+
+          if (typeof index !== "number" || index < 0 || index >= total) {
+            reply.code(400);
+            return {
+              status: "error",
+              message: `索引越界。当前列表长度为 ${total}，你发送的索引是 ${index}`,
+            };
+          }
+          this.api.handlersPasser.dispatch("del_list_track", { index });
+          this.api.storagePasser.saveState(this.api.statePasser.getState());
+          return {
+            status: "ok",
+            msg: "删除了列表中第" + (index + 1).toString() + "首",
+          };
+        });
+        instance.post("/add_track", async (req, reply) => {
+          const { path } = req.body || ""; // 期望是一个路径数组
+          // 1. 基本类型校验
+          if (typeof path !== "string" || path.trim() === "") {
+            reply.code(400);
+            return { status: "error", message: "路径必须是有效的字符串" };
+          }
+
+          // 2. 音频扩展名校验 (浏览器 audio 支持的常见格式)
+          const allowedExtensions = [
+            ".mp3",
+            ".flac",
+            ".wav",
+            ".m4a",
+            ".aac",
+            ".ogg",
+            ".webm",
+          ];
+          const ext = pathModule.extname(path).toLowerCase();
+
+          if (!allowedExtensions.includes(ext)) {
+            reply.code(400);
+            return {
+              status: "error",
+              message: `不支持的文件格式: ${
+                ext || "无后缀"
+              }。仅支持: ${allowedExtensions.join(", ")}`,
+            };
+          }
+
+          // 3. 路径存在性校验 (Node.js 原生 fs 检查)
+          if (!fs.existsSync(path)) {
+            reply.code(404);
+            return {
+              status: "error",
+              message: "文件路径不存在，请检查路径是否正确",
+            };
+          }
+          const beforeList = this.api.statePasser.get("playlist") || [];
+          const existingPaths = new Set(beforeList.map((t) => t.path));
+          const hasDuplicate = existingPaths.has(path);
+          if (hasDuplicate) {
+            reply.code(409);
+            return { status: "error", message: "播放列表中已存在" };
+          }
+          try {
+            this.api.statePasser.appendToPlaylist([{ path: path }]);
+            reply.code(201);
+            this.api.storagePasser.saveState(this.api.statePasser.getState());
+
+            // 7) 广播 playlist_changed（payload 中只带 playlist）
+            this.api.eventPasser.emit("playlist_changed", {
+              playlist: this.api.statePasser.get("playlist"),
+            });
+            return { status: "ok", message: "添加成功" };
+          } catch (err) {
+            reply.code(500);
+            return { status: "error", message: "处理文件元数据时出错" };
+          }
         });
       },
       { prefix: "/api/playlist" }

@@ -47,5 +47,9 @@ V4.0.0 手动重载插件实现
 |
 V4.0.1 将seek行为也添加到链路中
 |
-|----------------->Plugin/server player 完善 /api/player/*
-|
+|----------------->Plugin/server
+|                       |
+|                  player 完善 /api/player/*         
+|                       |
+|                  playlist 完善 /api/playlist/*
+|               
