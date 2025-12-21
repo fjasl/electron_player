@@ -128,11 +128,11 @@ class AudioManager {
     }
   }
 
-  seekToPercent(percent) {
-    const duration = this.audio.duration || 0;
-    if (duration <= 0) return;
-    const clamped = Math.max(0, Math.min(1, percent));
-    this.audio.currentTime = clamped * duration;
+  seekToPosition(position) {
+    // const duration = this.audio.duration || 0;
+    // if (duration <= 0) return;
+    // const clamped = Math.max(0, Math.min(1, percent));
+    this.audio.currentTime = position;
   }
 
   getCurrent() {

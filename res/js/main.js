@@ -44,7 +44,6 @@ audioManager.callbacks.onEnded = () => {
   sendIntent("play_next", {});
 };
 
-
 // ============== 播放界面 → AudioManager / 后端意图 ==============
 
 // 播放/暂停：只控制 <audio>，后端通过 audio 事件感知
@@ -82,7 +81,7 @@ playUI.callbacks.onModeChange = (mode) => {
 playUI.callbacks.onSeek = (percent) => {
   //console.log("[frontend] 跳转进度：", percent);
   // 1）先让 audio 跳转
-  audioManager.seekToPercent(percent);
+  //audioManager.seekToPercent(percent);
   // 2）立刻告诉后端（不用等 timeupdate）
   sendIntent("seek", { percent });
 };
@@ -179,9 +178,9 @@ mediaControl.callbacks.onPrev = () => {
 };
 
 //=================setting_view=================
-settingManager.callbacks.onPlugSelected=(name) =>{
-  sendIntent("plugin_ui_request",{name:name});
-}
+settingManager.callbacks.onPlugSelected = (name) => {
+  sendIntent("plugin_ui_request", { name: name });
+};
 
 // 监听后端 EventBus 发来的事件
 ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
@@ -247,7 +246,9 @@ ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
 
     return;
   }
-
+  if (name === "seek_reply") {
+    audioManager.seekToPosition(payload?.position);
+  }
   // 播放状态来自后端（主要是同步给 UI，真正驱动的是 <audio>）
   if (name === "play_state_changed") {
     const isPlaying = payload?.is_playing;
@@ -280,13 +281,13 @@ ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
     audioManager.setVolume(payload?.percent);
   }
 
-  if (name === "log"){
+  if (name === "log") {
     settingManager.addLog(payload?.msg);
   }
-  if (name === "plugin_loaded"){
+  if (name === "plugin_loaded") {
     settingManager.addPlugItem(payload?.name);
   }
-  if (name === "plugin_ui_reply"){
+  if (name === "plugin_ui_reply") {
     settingManager.renderWrenchViewUI(payload?.html);
   }
 });

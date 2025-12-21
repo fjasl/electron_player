@@ -180,24 +180,29 @@ async function handleSetPlayMode(payload, ctx) {
 /** 跳转进度（percent: 0~1） */
 async function handleSeek(payload, ctx) {
   const { stateStore, storage, eventBus } = ctx;
-  const position = payload?.position;
-  if (typeof position !== "number") return;
-
+  const percent = payload?.percent;
+  if (typeof percent !== "number") return;
   const ct = stateStore.get("current_track");
   const duration = ct.duration || 0;
+
   let newPos = 0;
   if (duration > 0) {
-    newPos = position;
+    newPos = duration*percent;
   }
+  if (newPos <= duration) {
+    stateStore.updateCurrentPosition(newPos);
+    stateStore.snapshotLastSession();
+    storage.saveState(stateStore.getState());
 
-  stateStore.updateCurrentPosition(newPos);
-  stateStore.snapshotLastSession();
-  storage.saveState(stateStore.getState());
-
-  // 仍然复用 current_track_changed，把 position 带出去
-  // eventBus.emit("current_track_changed", {
-  //   current: stateStore.get("current_track"),
-  // });
+    //仍然复用 current_track_changed，把 position 带出去
+    // eventBus.emit("current_track_changed", {
+    //   current: stateStore.get("current_track"),
+    // });
+    //仍然复用 current_track_changed，把 position 带出去
+    eventBus.emit("seek_reply", {
+      position: stateStore.get("current_track.position"),
+    });
+  }
 }
 
 /** 处理前端上报 */
@@ -218,9 +223,9 @@ async function handlePositionReport(payload, ctx) {
   // storage.saveState(stateStore.getState());
 
   // 仍然复用 current_track_changed，把 position 带出去
-  eventBus.emit("position_changed", {
-    current: stateStore.get("current_track"),
-  });
+  // eventBus.emit("position_changed", {
+  //   current: stateStore.get("current_track"),
+  // });
 
   currentIndex = LrcParser.findLyricByTime(position);
   if (currentIndex !== stateStore.get("Lyric.currentLyricRow")) {
