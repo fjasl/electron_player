@@ -241,6 +241,79 @@ class ServerPlugin {
             return { status: "error", message: "处理文件元数据时出错" };
           }
         });
+
+        instance.post("/bind_track_lyric", async (req, reply) => {
+          const { index, path } = req.body || ""; // 期望是一个路径数组
+          // 1. 基本类型校验
+          if (typeof path !== "string" || path.trim() === "") {
+            reply.code(400);
+            return { status: "error", message: "路径必须是有效的字符串" };
+          }
+          // 2. 音频扩展名校验 (浏览器 audio 支持的常见格式)
+          const allowedExtensions = [".lrc"];
+          const ext = pathModule.extname(path).toLowerCase();
+
+          if (!allowedExtensions.includes(ext)) {
+            reply.code(400);
+            return {
+              status: "error",
+              message: `不支持的文件格式: ${
+                ext || "无后缀"
+              }。仅支持: ${allowedExtensions.join(", ")}`,
+            };
+          }
+          // 3. 路径存在性校验 (Node.js 原生 fs 检查)
+          if (!fs.existsSync(path)) {
+            reply.code(404);
+            return {
+              status: "error",
+              message: "文件路径不存在，请检查路径是否正确",
+            };
+          }
+          const songList = this.api.statePasser.get("playlist") || [];
+          const total = songList.length;
+
+          if (typeof index !== "number" || index < 0 || index >= total) {
+            reply.code(400);
+            return {
+              status: "error",
+              message: `索引越界。当前列表长度为 ${total}，你发送的索引是 ${index}`,
+            };
+          }
+          try {
+            songList[index].lyric_bind = path;
+            this.api.statePasser.setPlaylist(songList);
+            this.api.storagePasser.saveState(this.api.statePasser.getState());
+            const ct = this.api.statePasser.get("current_track");
+            if (ct.index === songList[index].index) {
+              const nct = {
+                index: ct.index,
+                path: ct.path,
+                position: ct.position,
+                duration: ct.duration,
+                title: ct.title,
+                artist: ct.title,
+                likedCount: ct.likedCount,
+                lyric_bind: songList[index].lyric_bind,
+                cover: ct.cover,
+              };
+              this.api.statePasser.setCurrentTrackFromTrack(nct);
+              const lyric = await this.api.lyricPasser.loadAndParseLrcFile(
+                path
+              );
+              this.api.statePasser.setLyricList(lyric);
+              this.api.eventPasser.emit("current_track_changed", {
+                current: nct,
+                lyric: lyric,
+              });
+            }
+            reply.code(200);
+            return { status: "ok", message: "歌词添加成功" };
+          } catch (err) {
+            reply.code(500);
+            return { status: "error", message: "尝试添加歌词时出错" };
+          }
+        });
       },
       { prefix: "/api/playlist" }
     );
@@ -296,12 +369,7 @@ class ServerPlugin {
       });
     };
 
-    [
-      "playlist_changed",
-      "current_track_changed",
-      "play_mode_changed",
-      "volume_changed",
-    ].forEach((event) => {
+    ["position_changed"].forEach((event) => {
       this.api.on(event, (data) => broadcast(data, event));
     });
 

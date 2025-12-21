@@ -223,9 +223,9 @@ async function handlePositionReport(payload, ctx) {
   // storage.saveState(stateStore.getState());
 
   // 仍然复用 current_track_changed，把 position 带出去
-  // eventBus.emit("position_changed", {
-  //   current: stateStore.get("current_track"),
-  // });
+  eventBus.emit("position_changed", {
+    position: stateStore.get("current_track.position"),
+  });
 
   currentIndex = LrcParser.findLyricByTime(position);
   if (currentIndex !== stateStore.get("Lyric.currentLyricRow")) {

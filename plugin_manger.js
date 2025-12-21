@@ -254,9 +254,10 @@ class PluginManager extends EventEmitter {
     if (!this.deps) {
       throw new Error(`[PluginManager] 核心依赖尚未注入，无法创建 API`);
     }
-    const { stateStore, eventBus, stateMachine,storage } = this.deps;
+    const { stateStore, eventBus, stateMachine,storage,LrcParser } = this.deps;
     return {
       name: pluginName,
+      lyricPasser:LrcParser,
       storagePasser:storage,
       eventPasser: eventBus,
       log: (...args) => eventBus.log(`[${pluginName}]`, ...args),

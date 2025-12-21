@@ -54,4 +54,6 @@ V4.0.1 将seek行为也添加到链路中
 |                  playlist 完善 /api/playlist/*
 |                       |
 |                  lyric 完善 /api/lyric/*
+|                       |
+|                   再次完善playlist添加绑定歌词
 |

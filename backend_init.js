@@ -35,6 +35,7 @@ async function initBackend(win) {
     eventBus,
     stateMachine,
     storage,
+    LrcParser,
   });
   pluginManager.registerUIRequestIntent();
   module.exports.pluginManager = pluginManager;
