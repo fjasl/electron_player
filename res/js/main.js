@@ -285,9 +285,19 @@ ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
     settingManager.addLog(payload?.msg);
   }
   if (name === "plugin_loaded") {
+    settingManager.addLog("加载了plug");
     settingManager.addPlugItem(payload?.name);
   }
   if (name === "plugin_ui_reply") {
     settingManager.renderWrenchViewUI(payload?.html);
+  }
+  if (name === "plug_event") {
+    settingManager.addLog("执行了一次plug_event");
+    console.log("执行了一次plug_event"+payload?.name);
+    console.log(settingManager.activePlugName);
+    if (settingManager.activePlugName === payload?.name) {
+      settingManager.addLog("修改了serverUI");
+      settingManager.sendMessageToWrench(payload?.intent,payload?.data);
+    }
   }
 });

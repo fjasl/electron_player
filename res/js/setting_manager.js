@@ -145,7 +145,9 @@ class SettingManager {
    * @param {string} message 要添加的日志内容
    */
   addLog(message) {
-    if (!this.logOutput) return;
+    if (!this.logOutput){
+     return;
+    }
 
     // 格式化时间 HH:MM:SS
     const now = new Date();
@@ -161,7 +163,6 @@ class SettingManager {
 
     // 追加到文本框
     this.logOutput.value += formattedLog;
-
     // 限制日志行数（只保留最后50行）
     this.limitLogs();
 
@@ -186,11 +187,32 @@ class SettingManager {
 
         // 打印日志，方便调试
         this.addLog(`主窗口收到来自 iframe 的意图: ${intent}`);
-        sendIntent("server_plugin_port", { port: payload });
+        sendIntent(intent, { port: payload });
         console.log(`Intent: ${intent}, Payload:`, payload);
       }
     });
   }
+  // 在 SettingManager 类中添加此方法
+  sendMessageToWrench(intent, payload) {
+    this.addLog(`主窗口正在向 iframe 发送意图: ${intent}`)
+    const iframe = this.dom.wrenchViewIframe;
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.postMessage(
+        {
+          source: "main-window-api",
+          intent: intent, // 明确意图
+          payload: payload,
+        },
+        "*"
+      );
+      // 可选：在日志中记录发送动作
+      // this.addLog(`[Main -> Iframe] 发送意图: ${intent}`);
+    } else {
+      console.error("无法发送消息：Iframe 尚未加载或不存在。");
+    }
+  }
+
+
   /**
    * [新增私有方法] 限制日志条目为50条
    */

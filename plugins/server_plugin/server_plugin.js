@@ -10,7 +10,6 @@ class ServerPlugin {
 
     this.port = 3000;
   }
-
   async activate(api) {
     this.api = api;
     this.server = fastify();
@@ -20,16 +19,18 @@ class ServerPlugin {
       this.api.log("没有找到指定端口 默认创建3000作为端口" + e);
       this.api.statePasser.upsertPlugin({
         name: this.name,
-        port: payload?.port,
+        port: this.port,
       });
-      this.api.storagePasser.saveState(this.api.statePasser.getState());
-      this.api.log("端口成功保存");
     }
+    this.api.storagePasser.saveState(this.api.statePasser.getState());
     this.api.log("服务器在" + this.port + "端口启动");
-    this.api.on("server_plugin_port", (data) => {
-      this.api.log(`接收到 'server_plugin_port' 意图，数据:`, data);
-    });
 
+    this.api.registerIntent("server_plugin_loaded", (payload, ctx) => {
+      this.api.eventPasser.plug_emit(this.name, "current_port", {
+        port: this.port,
+      });
+      this.api.log("发送一次修改端口请求");
+    });
     this.api.registerIntent("server_plugin_port", (payload, ctx) => {
       this.api.statePasser.upsertPlugin({
         name: this.name,

@@ -55,5 +55,6 @@ V4.0.1 将seek行为也添加到链路中
 |                       |
 |                  lyric 完善 /api/lyric/*
 |                       |
-|                   再次完善playlist添加绑定歌词
+|                  playlist more 再次完善playlist添加绑定歌词
 |
+V4.0.2 想办法让插件设置界面也支持跟随设置了

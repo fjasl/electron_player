@@ -16,8 +16,10 @@ class PluginManager extends EventEmitter {
     this.deps = deps;
     this.Pluglist = []; // 存储扫描到的插件元数据
     this.deps.eventBus.log("[PluginManager] 插件管理器初始化完成");
+    this.callbacks = {
+      plug_ui_loaded: [],
+    };
   }
-
 
   // 确保 plugins 目录存在
   ensurePluginDir() {
@@ -53,8 +55,8 @@ class PluginManager extends EventEmitter {
           });
           // 直接调用你原本的 loadPlugin 逻辑
           // 注意：传给 loadPlugin 的是相对于 pluginDir 的路径，如 "folder/plugin.js"
-          this.loadPlugin(path.join(entry.name, jsName));
-          this.deps.eventBus.emit("plugin_loaded", { name: jsName });
+          const pluginName = this.loadPlugin(path.join(entry.name, jsName));
+          this.deps.eventBus.emit("plugin_loaded", { name: pluginName });
         } else if (jsFiles.length > 1) {
           this.deps.eventBus.log(
             `[PluginManager] 跳过 ${entry.name}: JS数量错误`
@@ -75,12 +77,19 @@ class PluginManager extends EventEmitter {
     // 注册意图 "plugin_ui_request"
     this.deps.stateMachine.registerHandler("plugin_ui_request", (payload) => {
       const pluginName = payload.name;
-      const htmlContent = this.getPluginUIHtml(pluginName);
+      this.deps.eventBus.log("2" + pluginName);
+      this.deps.eventBus.log("3" + this.plugins.get(pluginName).filename);
+      const htmlContent = this.getPluginUIHtml(
+        this.plugins.get(pluginName).filename
+      );
       if (htmlContent) {
         // 如果成功获取 HTML，通过 EventBus 发送回复到前端主窗口
         // 事件名为 "plugin_ui_reply"
         this.deps.eventBus.emit("plugin_ui_reply", { html: htmlContent });
         this.deps.eventBus.log(`[PluginManager] 已响应 UI 请求: ${pluginName}`);
+        this.callbacks.plug_ui_loaded?.forEach((callback) => {
+          callback(pluginName);
+        });
       } else {
         // 发送一个失败回复
         this.deps.eventBus.emit("plugin_ui_reply", {
@@ -128,6 +137,7 @@ class PluginManager extends EventEmitter {
   //加载单个插件;
   loadPlugin(filename) {
     const filePath = path.join(this.pluginDir, filename);
+    let pluginname = null;
 
     // 如果已经加载过，先卸载
     const existingName = [...this.plugins.entries()].find(
@@ -161,6 +171,7 @@ class PluginManager extends EventEmitter {
         return;
       }
       const pluginName = pluginInstance.name;
+      pluginname = pluginName;
 
       // 初始化插件，注入核心 API
       const api = this.createPluginAPI(pluginName);
@@ -174,18 +185,14 @@ class PluginManager extends EventEmitter {
         instance: pluginInstance,
         module: PluginModule,
         filePath,
-        filename,
-        //watcher, // watcher 现在可能是 undefined
+        filename: filename.split("\\").pop(),
         enabled: true,
       });
       this.deps.eventBus.log(
         `[PluginManager] 插件加载成功: ${pluginName} (${filename})`
       );
       // 触发事件通知其他插件或系统
-      this.emit("plugin-loaded", {
-        name: pluginName,
-        instance: pluginInstance,
-      });
+      
     } catch (err) {
       this.deps.eventBus.log(
         `[PluginManager] 加载插件失败 ${filename}:`,
@@ -196,6 +203,7 @@ class PluginManager extends EventEmitter {
         err.stack
       );
     }
+    return pluginname;
   }
 
   // 卸载插件
@@ -254,11 +262,13 @@ class PluginManager extends EventEmitter {
     if (!this.deps) {
       throw new Error(`[PluginManager] 核心依赖尚未注入，无法创建 API`);
     }
-    const { stateStore, eventBus, stateMachine,storage,LrcParser } = this.deps;
+    const { stateStore, eventBus, stateMachine, storage, LrcParser } =
+      this.deps;
     return {
       name: pluginName,
-      lyricPasser:LrcParser,
-      storagePasser:storage,
+      callbacks: this.callbacks,
+      lyricPasser: LrcParser,
+      storagePasser: storage,
       eventPasser: eventBus,
       log: (...args) => eventBus.log(`[${pluginName}]`, ...args),
       error: (...args) => eventBus.log(`[${pluginName}]`, ...args),

@@ -82,32 +82,51 @@
       </div>
     </div>
 
-    <!-- 引入 API 桥接脚本 -->
-    <!-- 路径需要根据你的实际项目结构调整 -->
     <script>
-    //   function saveSettings() {
-    //     const port = document.getElementById("server_port").value;
-
-    //     // 使用我们定义的 API 发送意图到主窗口
-    //     // 意图名称使用你指定的 "server_plugin_saved"
-    //     if (window.PluginAPI) {
-    //       window.PluginAPI.sendIntent("server_plugin_port", { port: port });
-    //     } else {
-    //       console.error("PluginAPI not found!");
-    //     }
-    //   }
-      
-    function saveSettings(){
+      function saveSettings() {
         const port = document.getElementById("server_port").value;
-         window.parent.postMessage(
-              {
-                source: "iframe-plugin-api",
-                intent: "server_plugin_port",
-                payload: port,
-              },
-              "*"
-            );
-    }
+        window.parent.postMessage(
+          {
+            source: "iframe-plugin-api",
+            intent: "server_plugin_port",
+            payload: port,
+          },
+          "*"
+        );
+      }
+      window.addEventListener("DOMContentLoaded", () => {
+        console.log("[Iframe] 页面已加载，发送 loaded 意图...");
+        window.parent.postMessage(
+          {
+            source: "iframe-plugin-api",
+            intent: "server_plugin_loaded",
+            payload: {},
+          },
+          "*"
+        );
+      });
+      window.addEventListener("message", (event) => {
+        // 1. 安全校验：只处理来自主窗口 API 的消息
+        if (event.data && event.data.source === "main-window-api") {
+          const { intent, payload } = event.data;
+
+          console.log(`[Iframe] 收到主窗口意图: ${intent}`, payload);
+
+          // 2. 根据意图处理数据
+          switch (intent) {
+            case "current_port": // 对应后端发送的意图
+              if (payload && payload.port) {
+                document.getElementById("server_port").value = payload.port;
+              }
+              break;
+
+            // 可以在这里扩展更多的 case
+            case "other_intent":
+              console.log("处理其他逻辑");
+              break;
+          }
+        }
+      });
     </script>
   </body>
 </html>

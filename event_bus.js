@@ -13,15 +13,35 @@ class EventBus extends EventEmitter {
   }
   // 修改 EventBus 里的 log 方法
   log(...args) {
-    const content = args.map(arg => {
+    const content = args
+      .map((arg) => {
         if (arg instanceof Error) return arg.stack; // 打印堆栈
-        if (typeof arg === 'object') return JSON.stringify(arg);
+        if (typeof arg === "object") return JSON.stringify(arg);
         return arg;
-    }).join(' ');
-    
-    this.emit("log", { msg: content });
-}
+      })
+      .join(" ");
 
+    this.emit("log", { msg: content });
+  }
+  /**
+   * 封装插件专用 Emit
+   * @param {string} plugName 插件名称/标识
+   * @param {string} intent 意图/子事件名 (如 'status_change')
+   * @param {any} data 携带的数据
+   */
+  plug_emit(plugName, intent, data = {}) {
+    const eventName = "plug_event";
+    const payload = {
+      name: plugName,
+      intent: intent,
+      data: data,
+    };
+
+    // 触发后端 EventEmitter 监听 (例如插件内部 api.on('plug_emit', ...))
+    this.emit(eventName, payload);
+
+    // 注意：这里的 this.emit 已经包含了发送给前端 win.webContents.send 的逻辑
+  }
 
   // 重写或扩展 emit 方法
   emit(eventName, payload = {}) {
