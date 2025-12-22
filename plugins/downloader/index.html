@@ -162,6 +162,45 @@
         font-size: 90%;
       }
     }
+
+    /* Toast 容器 */
+    #toast_container {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px); /* 初始隐藏在下方 */
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border-radius: 2rem;
+      font-size: 0.9rem;
+      z-index: 9999;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+        opacity 0.3s;
+      opacity: 0;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    #toast_container.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* 成功图标（可选） */
+    .toast_icon {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #4caf50; /* 成功绿点 */
+      box-shadow: 0 0 8px #4caf50;
+    }
   </style>
   <body>
     <div id="main_box">
@@ -177,31 +216,31 @@
       </div>
 
       <!-- 列表区域 -->
-      <div id="list_box">
-        <div class="list_item content_container">
-          <div class="item_title">极简主义</div>
-          <div class="item_desc">移除所有颜色干扰，专注于黑白灰层级表现。</div>
-        </div>
-        <div class="list_item content_container">
-          <div class="item_title">交互式图标</div>
-          <div class="item_desc">
-            搜索图标外层包裹了圆形容器，在鼠标悬停时会显示出柔和的灰色背景。
-          </div>
-        </div>
-        <div class="list_item content_container">
-          <div class="item_title">一致性</div>
-          <div class="item_desc">
-            所有元素宽度同步，间距使用相对单位 em 和百分比。
-          </div>
-        </div>
-      </div>
+      <div id="list_box"></div>
+    </div>
+    <div id="toast_container">
+      <div class="toast_icon"></div>
+      <span id="toast_text">下载成功</span>
     </div>
   </body>
   <script>
     const searchInput = document.getElementById("input_box");
     const searchBtn = document.getElementById("search_btn");
     const listBox = document.getElementById("list_box");
+    const toast = document.getElementById("toast_container");
+    const toastText = document.getElementById("toast_text");
+
     let songList = [];
+
+    function showToast(message) {
+      toastText.innerText = message;
+      toast.classList.add("show");
+
+      // 3秒后自动消失
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 3000);
+    }
 
     searchBtn.addEventListener("click", () => {
       const keyword = searchInput.value.trim();
@@ -209,7 +248,7 @@
         {
           source: "iframe-plugin-api",
           intent: "music_downloader_plugin_quest_search",
-          payload: {keyword},
+          payload: { keyword },
         },
         "*"
       );
@@ -236,6 +275,14 @@
           // 这里的 index 现在是确切的数字 (0, 1, 2...)
           console.log("当前索引:", index);
           console.log("对应数据:", songList[index]);
+          window.parent.postMessage(
+            {
+              source: "iframe-plugin-api",
+              intent: "music_downloader_plugin_list_click",
+              payload: { index },
+            },
+            "*"
+          );
         };
 
         listBox.appendChild(itemDiv);
@@ -253,6 +300,13 @@
           case "music_downloader_search_results_reply": // 对应后端发送的意图
             if (payload) {
               updateList(payload?.results);
+            }
+            break;
+          case "music_downloader_plug_download_complete":
+            if (payload && payload.path) {
+              // 提取文件名（可选）
+              const fileName = payload.path.split(/[\\/]/).pop();
+              showToast(`已下载: ${fileName}`);
             }
             break;
 
