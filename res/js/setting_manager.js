@@ -187,7 +187,7 @@ class SettingManager {
 
         // 打印日志，方便调试
         this.addLog(`主窗口收到来自 iframe 的意图: ${intent}`);
-        sendIntent(intent, { port: payload });
+        sendIntent(intent,  payload );
         console.log(`Intent: ${intent}, Payload:`, payload);
       }
     });

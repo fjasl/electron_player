@@ -77,8 +77,6 @@ class PluginManager extends EventEmitter {
     // 注册意图 "plugin_ui_request"
     this.deps.stateMachine.registerHandler("plugin_ui_request", (payload) => {
       const pluginName = payload.name;
-      this.deps.eventBus.log("2" + pluginName);
-      this.deps.eventBus.log("3" + this.plugins.get(pluginName).filename);
       const htmlContent = this.getPluginUIHtml(
         this.plugins.get(pluginName).filename
       );

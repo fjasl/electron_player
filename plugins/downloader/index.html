@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Monochrome Glassmorphism UI</title>
+  </head>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      font-size: 100%;
+      font-family: system-ui, -apple-system, sans-serif;
+      overflow: hidden;
+      background-color: #000000;
+    }
+
+    #main_box {
+      width: 100%;
+      height: 100%;
+      /* 改为黑灰透明色调 */
+      background: inherit;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    #search_bar {
+      width: 100%;
+      flex: 2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .content_container {
+      width: 85%;
+      max-width: 90%;
+    }
+
+    .search_wrapper {
+      position: relative;
+    }
+
+    .search_wrapper input {
+      width: 100%;
+      padding: 0.8em 4em 0.8em 1.2em;
+      border-radius: 1.5em;
+      /* 黑白灰边框与背景 */
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.05);
+      color: #ffffff;
+      font-size: 1rem;
+      outline: none;
+      transition: 0.3s;
+    }
+
+    .search_wrapper input:focus {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    /* 搜索图标容器：实现 hover 显色 */
+    .icon_circle {
+      position: absolute;
+      right: 0.5em;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 2.5em;
+      height: 2.5em;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .icon_circle:hover {
+      background: rgba(255, 255, 255, 0.15); /* hover 时的灰色圆圈 */
+    }
+
+    /* CSS 绘制的搜索图标 */
+    .search_icon {
+      width: 0.9em;
+      height: 0.9em;
+      border: 0.12em solid rgba(255, 255, 255, 0.8);
+      border-radius: 50%;
+      position: relative;
+      /* 防止图标本身触发鼠标事件，让父级容器处理 */
+      pointer-events: none;
+    }
+    .search_icon::after {
+      content: "";
+      position: absolute;
+      width: 0.12em;
+      height: 0.4em;
+      background: rgba(255, 255, 255, 0.8);
+      bottom: -0.35em;
+      right: -0.25em;
+      transform: rotate(-45deg);
+    }
+
+    #list_box {
+      width: 100%;
+      flex: 8;
+      padding-bottom: 5%;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5%;
+    }
+
+    .list_item {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 1.2rem;
+      border-radius: 1rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: white;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .list_item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .item_title {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #ffffff; /* 纯白 */
+      margin-bottom: 0.4rem;
+    }
+
+    .item_desc {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.5); /* 浅灰 */
+      line-height: 1.4;
+    }
+
+    /* 滚动条美化 */
+    #list_box::-webkit-scrollbar {
+      width: 4px;
+    }
+    #list_box::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+    }
+
+    @media (max-width: 400px) {
+      html {
+        font-size: 90%;
+      }
+    }
+  </style>
+  <body>
+    <div id="main_box">
+      <!-- 搜索栏 -->
+      <div id="search_bar">
+        <div class="search_wrapper content_container">
+          <input type="text" placeholder="Search..." id="input_box" />
+          <!-- 图标外层 div -->
+          <div class="icon_circle" id="search_btn">
+            <div class="search_icon"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 列表区域 -->
+      <div id="list_box">
+        <div class="list_item content_container">
+          <div class="item_title">极简主义</div>
+          <div class="item_desc">移除所有颜色干扰，专注于黑白灰层级表现。</div>
+        </div>
+        <div class="list_item content_container">
+          <div class="item_title">交互式图标</div>
+          <div class="item_desc">
+            搜索图标外层包裹了圆形容器，在鼠标悬停时会显示出柔和的灰色背景。
+          </div>
+        </div>
+        <div class="list_item content_container">
+          <div class="item_title">一致性</div>
+          <div class="item_desc">
+            所有元素宽度同步，间距使用相对单位 em 和百分比。
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    const searchInput = document.getElementById("input_box");
+    const searchBtn = document.getElementById("search_btn");
+    const listBox = document.getElementById("list_box");
+    let songList = [];
+
+    searchBtn.addEventListener("click", () => {
+      const keyword = searchInput.value.trim();
+      window.parent.postMessage(
+        {
+          source: "iframe-plugin-api",
+          intent: "music_downloader_plugin_quest_search",
+          payload: {keyword},
+        },
+        "*"
+      );
+    });
+
+    function updateList(dataList) {
+      listBox.innerHTML = "";
+      // 每次更新前清空 songList，防止数据重复叠加
+      songList = [];
+
+      dataList.forEach((item, index) => {
+        const itemDiv = document.createElement("div");
+        itemDiv.className = "list_item content_container";
+
+        itemDiv.innerHTML = `
+           <div class="item_title">${item.title}</div>
+           <div class="item_desc">${item.desc}</div>
+         `;
+
+        songList.push({ index, title: item.title, desc: item.desc });
+
+        // 修正点：去掉参数 index，直接利用闭包引用外层的 index 数字
+        itemDiv.onclick = () => {
+          // 这里的 index 现在是确切的数字 (0, 1, 2...)
+          console.log("当前索引:", index);
+          console.log("对应数据:", songList[index]);
+        };
+
+        listBox.appendChild(itemDiv);
+      });
+    }
+    window.addEventListener("message", (event) => {
+      // 1. 安全校验：只处理来自主窗口 API 的消息
+      if (event.data && event.data.source === "main-window-api") {
+        const { intent, payload } = event.data;
+
+        console.log(`[Iframe] 收到主窗口意图: ${intent}`, payload);
+
+        // 2. 根据意图处理数据
+        switch (intent) {
+          case "music_downloader_search_results_reply": // 对应后端发送的意图
+            if (payload) {
+              updateList(payload?.results);
+            }
+            break;
+
+          // 可以在这里扩展更多的 case
+          case "other_intent":
+            console.log("处理其他逻辑");
+            break;
+        }
+      }
+    });
+    // --- 模拟调用：创建5个测试条目 ---
+  </script>
+</html>
