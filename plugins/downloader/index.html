@@ -201,6 +201,140 @@
       background: #4caf50; /* 成功绿点 */
       box-shadow: 0 0 8px #4caf50;
     }
+
+    #setting_box {
+      position: relative;
+      width: 10%;
+      aspect-ratio: 1 / 1; /* 锁定纵横比为 1:1 */
+      background-color: rgba(255, 255, 255, 0.071);
+      position: absolute;
+      right: 2%;
+      bottom: 2%;
+      border-radius: 8px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      z-index: 100;
+    }
+    @keyframes rotate {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    #setting_box:hover {
+      background-color: #333; /* 鼠标悬停时背景变深色 */
+    }
+
+    /* 当鼠标悬停在 box 上时，对内部的 SVG 应用动画 */
+    #setting_box:hover svg {
+      /* 应用名为 rotate 的动画，持续 1.5 秒，线性速度，无限循环 */
+      animation: rotate 1.5s linear infinite;
+    }
+
+    /* 确保 SVG 内部的填充颜色在 hover 时改变 */
+    #setting_box:hover svg path {
+      fill: white; /* 悬停时图标颜色变为白色 */
+    }
+    /* 绘制中间的圆孔和主体圆盘 */
+
+    #setting_view_box {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      left: 0;
+      top: 0;
+      background-color: rgba(0, 0, 0, 0.317);
+      z-index: 999;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      display: none; /* 默认隐藏 */
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    #setting_view_box.visible {
+      display: flex; /* 使用 flex 显示 */
+      opacity: 1;
+    }
+    #setting_view {
+      width: 80%;
+      height: 80%;
+      background-color: rgb(54, 54, 54);
+      backdrop-filter: blur(10px);
+      --webkit-backdrop-filter: blur(10px);
+      border-radius: 20px;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+    }
+    /* setting_menu 布局调整：使其内容垂直居中 */
+    #setting_menu {
+      width: 80%;
+      height: 80%;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start; /* 调整为靠顶部对齐，防止输入框被遮挡 */
+      padding-top: 5%; /* 添加一些顶部内边距 */
+    }
+
+    /* 输入框容器 */
+    .address_input_wrapper {
+      display: flex;
+      width: 100%; /* 占据 setting_menu 的全部宽度 */
+      max-width: 500px; /* 限制最大宽度使其看起来更美观 */
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden; /* 确保子元素圆角一致 */
+      /* 继承玻璃效果的边框 */
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* 输入框本身 */
+    .address_input {
+      flex-grow: 1;
+      padding: 1em 1em;
+      border: none;
+      background: transparent; /* 透明背景以显示父容器的玻璃效果 */
+      color: white;
+      font-size: 0.9rem;
+      outline: none;
+      /* 使用 placeholder 颜色与 desc 文本保持一致 */
+      color-scheme: dark; /* 确保浏览器默认 UI 控件为深色 */
+    }
+
+    .address_input::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .address_input:focus {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* 按钮样式 */
+    .action_button {
+      /* 确保按钮不压缩输入框，而是固定宽度 */
+      flex-shrink: 0;
+      padding: 0 1em;
+      border: none;
+      background-color: rgba(255, 255, 255, 0.1); /* 浅灰色背景 */
+      color: white;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      font-weight: bold;
+    }
+
+    .action_button:hover {
+      background-color: rgba(255, 255, 255, 0.2); /* 悬停效果 */
+    }
   </style>
   <body>
     <div id="main_box">
@@ -222,6 +356,33 @@
       <div class="toast_icon"></div>
       <span id="toast_text">下载成功</span>
     </div>
+
+    <div id="setting_view_box">
+        <div id="setting_view">
+          <div id="setting_menu">
+            <div class="address_input_wrapper">
+              <input
+                type="text"
+                placeholder="请输入服务器地址 URL..."
+                class="address_input"
+                id="address_input_box"
+                readonly
+              />
+              <button class="action_button" onclick="handleGoClick()">GO</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="setting_box">
+        <svg viewBox="0 0 24 24" width="70%" height="70%" fill="#333">
+          <path
+            d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.81,11.69,4.81,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"
+          />
+        </svg>
+      </div>
+    </div>
+
   </body>
   <script>
     const searchInput = document.getElementById("input_box");
@@ -229,8 +390,25 @@
     const listBox = document.getElementById("list_box");
     const toast = document.getElementById("toast_container");
     const toastText = document.getElementById("toast_text");
+    const settingBox = document.getElementById("setting_box");
+    const settingViewBox = document.getElementById("setting_view_box");
+    const settingView = document.getElementById("setting_view");
+    const addressInput = document.getElementById("address_input_box");
 
     let songList = [];
+
+
+    window.addEventListener("DOMContentLoaded", () => {
+        console.log("[Iframe] 页面已加载，发送 loaded 意图...");
+        window.parent.postMessage(
+          {
+            source: "iframe-plugin-api",
+            intent: "music_downloader_plugin_loaded",
+            payload: {},
+          },
+          "*"
+        );
+      });
 
     function showToast(message) {
       toastText.innerText = message;
@@ -309,7 +487,12 @@
               showToast(`已下载: ${fileName}`);
             }
             break;
-
+            case "music_downloader_plugin_current_dir":
+              if(payload&& payload.path){
+                addressInput.title = payload.path;
+                addressInput.value ="当前保存位置："+String(payload.path);
+              }
+              break;
           // 可以在这里扩展更多的 case
           case "other_intent":
             console.log("处理其他逻辑");
@@ -317,6 +500,42 @@
         }
       }
     });
-    // --- 模拟调用：创建5个测试条目 ---
+    function openSettings() {
+      settingViewBox.classList.add("visible");
+      // 可选：阻止背景滚动
+      document.body.style.overflow = "hidden";
+    }
+
+    // 2. 关闭设置视图的函数
+    function closeSettings() {
+      settingViewBox.classList.remove("visible");
+      document.body.style.overflow = "auto";
+    }
+
+    // 3. 监听设置按钮点击事件，显示弹窗
+    settingBox.addEventListener("click", openSettings);
+
+    // 4. 监听背景点击事件，关闭弹窗
+    settingViewBox.addEventListener("click", function (event) {
+      // 检查点击事件的目标是否恰好是 settingViewBox 本身
+      // 如果点击目标是 settingViewBox 内部的 settingView，则不关闭
+      if (event.target === settingViewBox) {
+        closeSettings();
+      }
+    });
+    function handleGoClick(){
+      window.parent.postMessage(
+            {
+              source: "iframe-plugin-api",
+              intent: "music_downloader_plugin_address_change",
+              payload: { },
+            },
+            "*"
+          );
+    }
+    // 注意：如果你的 #setting_menu 内部的元素设置了 z-index 或 position，
+    // 它们可能会导致 event.target 不是 settingViewBox。
+    // 上面的 if (event.target === settingViewBox) 是最可靠的检测“空白区域”点击的方法。
+    // 执行调用
   </script>
 </html>

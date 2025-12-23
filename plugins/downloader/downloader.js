@@ -5,6 +5,7 @@ const fs = require("fs");
 const path = require("path");
 const { pipeline } = require("stream/promises");
 const NodeID3 = require("node-id3");
+const { dialog } = require("electron");
 
 class MusicSearchPlugin {
   constructor() {
@@ -20,10 +21,76 @@ class MusicSearchPlugin {
    */
   activate(api) {
     this.api = api;
+
+    try {
+      this.Dir = this.api.statePasser.getPluginByName(this.name).dir;
+    } catch (e) {
+      this.api.log(
+        "没有找到指定路径,创建C:\\Users\\27576\\Desktop\\tmp\\download作为路径" +
+          e
+      );
+      this.api.statePasser.upsertPlugin({
+        name: this.name,
+        dir: this.Dir,
+      });
+      this.api.storagePasser.saveState(this.api.statePasser.getState());
+    }
     this.api.log("音乐搜索插件已激活");
     this.api.log("测试");
     // 注册到状态机或监听事件总线
     // 假设您想监听前端传来的搜索请求
+    this.api.registerIntent(
+      "music_downloader_plugin_loaded",
+      async (payload) => {
+        
+          this.api.eventPasser.plug_emit(
+            this.name,
+            "music_downloader_plugin_current_dir",
+            {
+              path: this.Dir,
+            }
+          );
+          this.api.storagePasser.saveState(this.api.statePasser.getState());
+          this.api.log("请求了保存路径" + this.api);
+        
+      }
+    );
+    this.api.registerIntent(
+      "music_downloader_plugin_address_change",
+      async (payload) => {
+        // 注意：dialog.showOpenDialog 必须在主进程中运行
+        const result = await dialog.showOpenDialog({
+          title: "请选择音乐下载保存目录",
+          defaultPath: "", // 默认打开的路径
+          buttonLabel: "选择此文件夹",
+          properties: [
+            "openDirectory", // 必选：允许选择文件夹
+            "createDirectory", // 可选：允许在对话框中新建文件夹 (macOS)
+            "promptToCreate", // 可选：Windows 如果路径不存在则提示创建
+          ],
+        });
+
+        if (!result.canceled && result.filePaths.length > 0) {
+          const selectedPath = result.filePaths[0];
+          this.Dir = selectedPath;
+          this.api.eventPasser.plug_emit(
+            this.name,
+            "music_downloader_plugin_current_dir",
+            {
+              path: selectedPath,
+            }
+          );
+          this.api.statePasser.upsertPlugin({
+            name: this.name,
+            dir: this.Dir,
+          });
+          this.api.storagePasser.saveState(this.api.statePasser.getState());
+          this.api.log("修改了保存路径" + selectedPath);
+        } else {
+          console.log("用户取消了选择");
+        }
+      }
+    );
     this.api.registerIntent(
       "music_downloader_plugin_quest_search",
       async (payload) => {

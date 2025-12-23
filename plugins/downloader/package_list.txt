@@ -1,3 +1,4 @@
 axios
 cheerio
 node-id3
+electron
