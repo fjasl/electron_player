@@ -4,6 +4,7 @@ const cheerio = require("cheerio");
 const fs = require("fs");
 const path = require("path");
 const { pipeline } = require("stream/promises");
+const NodeID3 = require("node-id3");
 
 class MusicSearchPlugin {
   constructor() {
@@ -209,6 +210,40 @@ class MusicSearchPlugin {
         }
 
         await this.downloadFile(playUrl, Data.title, ".mp3");
+        const safeTitle = Data.title.replace(/[\\/:*?"<>|]/g, "_");
+        const jpgPath = path.join(this.Dir, `${safeTitle}.jpg`);
+        const mp3Path = path.join(this.Dir, `${safeTitle}.mp3`);
+
+        try {
+          const tags = {
+            title: Data.title,
+            artist: Data.author,
+          };
+
+          // 如果本地封面文件存在，读取并加入 tags
+          if (fs.existsSync(jpgPath)) {
+            tags.image = {
+              mime: "image/jpeg",
+              type: { id: 3, name: "front cover" },
+              description: "Cover",
+              imageBuffer: fs.readFileSync(jpgPath), // 直接读取本地刚才下载的图
+            };
+          }
+
+          // 写入 MP3 元数据
+          const success = NodeID3.write(tags, mp3Path);
+
+          if (success) {
+            this.api.log(`元数据已成功写入本地 MP3: ${safeTitle}`);
+          } else {
+            this.api.log("元数据写入失败");
+          }
+
+          // 可选：如果不需要保留本地 jpg 文件，可以在此处删除
+          // fs.unlinkSync(jpgPath);
+        } catch (err) {
+          this.api.log(`读取本地文件写入元数据出错: ${err.message}`);
+        }
       } else {
         this.api.log("未找到 window.appData 数据，可能页面结构已变化");
       }
