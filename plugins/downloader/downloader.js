@@ -42,17 +42,15 @@ class MusicSearchPlugin {
     this.api.registerIntent(
       "music_downloader_plugin_loaded",
       async (payload) => {
-        
-          this.api.eventPasser.plug_emit(
-            this.name,
-            "music_downloader_plugin_current_dir",
-            {
-              path: this.Dir,
-            }
-          );
-          this.api.storagePasser.saveState(this.api.statePasser.getState());
-          this.api.log("请求了保存路径" + this.api);
-        
+        this.api.eventPasser.plug_emit(
+          this.name,
+          "music_downloader_plugin_current_dir",
+          {
+            path: this.Dir,
+          }
+        );
+        this.api.storagePasser.saveState(this.api.statePasser.getState());
+        this.api.log("请求了保存路径" + this.api);
       }
     );
     this.api.registerIntent(
@@ -304,6 +302,28 @@ class MusicSearchPlugin {
             this.api.log(`元数据已成功写入本地 MP3: ${safeTitle}`);
           } else {
             this.api.log("元数据写入失败");
+          }
+
+          try {
+            this.api.statePasser.appendToPlaylist([{ path: mp3Path }]);
+            this.api.storagePasser.saveState(this.api.statePasser.getState());
+
+            // 7) 广播 playlist_changed（payload 中只带 playlist）
+            this.api.eventPasser.emit("playlist_changed", {
+              playlist: this.api.statePasser.get("playlist"),
+            });
+            this.api.log("添加歌曲到列表成功");
+
+            const ct = this.api.statePasser.get("playlist");
+            const targetItem = ct.find((item) => item.path === mp3Path);
+            targetItem.lyric_bind = path.join(
+              this.Dir,
+              `${Data.title.replace(/[\\/:*?"<>|]/g, "_")}.lrc`
+            );
+            this.api.storagePasser.saveState(this.api.statePasser.getState());
+            this.api.log("歌曲绑定歌词成功");
+          } catch (error) {
+            this.api.log("添加歌曲到列表或将歌词绑定到歌曲错误" + error);
           }
 
           // 可选：如果不需要保留本地 jpg 文件，可以在此处删除
