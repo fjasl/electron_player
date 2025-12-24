@@ -1,6 +1,7 @@
 // plugins/server_plugin.js
 const fastify = require("fastify");
 const websocket = require("@fastify/websocket");
+const cors = require("@fastify/cors"); // 1. 必须先引入
 const fs = require("fs");
 const pathModule = require("path"); // 重命名模块以防冲突
 
@@ -13,6 +14,14 @@ class ServerPlugin {
   async activate(api) {
     this.api = api;
     this.server = fastify();
+
+    await this.server.register(cors, {
+      origin: true, // 允许任何 Origin
+      methods: ["GET", "PUT", "POST", "DELETE", "OPTIONS"], // 允许所有常用方法
+      allowedHeaders: ["*"], // 允许任何自定义 Header
+      credentials: true, // 如果需要传 Cookie
+    });
+
     try {
       this.port = this.api.statePasser.getPluginByName(this.name).port;
     } catch (e) {
