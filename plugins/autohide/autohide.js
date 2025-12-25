@@ -9,38 +9,35 @@ class WindowHidePlugin {
       threshold: 50,
       gap: 5,
       animate: true,
+      expandDuration: 180, // ms
+      expandFPS: 60,
     };
 
-    // ====== 关键状态 ======
-    this.currentEdge = null;      // left | right | top | null
-    this.expandedBounds = null;   // 记录“完全展开时”的真实位置
-    this.isAnimating = false;     // 防止抖动
-    this.ignoreLeaveUntil = 0;    // expand 后短时间内忽略 mouse_leave
+    this.currentEdge = null;
+    this.expandedBounds = null;
+    this.isAnimating = false;
+    this.ignoreLeaveUntil = 0;
   }
 
   activate(api) {
     this.api = api;
-    this.api.log("WindowHidePlugin activate");
 
     if (this.api.winPasser) {
       this.api.winPasser.setAlwaysOnTop(true, "screen-saver");
     }
 
-    this.api.registerIntent("window_event_mouse_enter", () => {
-      this.handleEvent("enter");
-    });
-
-    this.api.registerIntent("window_event_mouse_leave", () => {
-      this.handleEvent("leave");
-    });
-
-    this.api.registerIntent("window_event_focus", () => {
-      this.handleEvent("focus");
-    });
-
-    this.api.registerIntent("window_event_blur", () => {
-      this.handleEvent("blur");
-    });
+    this.api.registerIntent("window_event_mouse_enter", () =>
+      this.handleEvent("enter")
+    );
+    this.api.registerIntent("window_event_mouse_leave", () =>
+      this.handleEvent("leave")
+    );
+    this.api.registerIntent("window_event_focus", () =>
+      this.handleEvent("focus")
+    );
+    this.api.registerIntent("window_event_blur", () =>
+      this.handleEvent("blur")
+    );
   }
 
   handleEvent(type) {
@@ -53,7 +50,6 @@ class WindowHidePlugin {
     }
 
     if (type === "leave" || type === "blur") {
-      // expand 后短时间内禁止 retract
       if (Date.now() < this.ignoreLeaveUntil) return;
       this.retract(win);
     }
@@ -89,32 +85,66 @@ class WindowHidePlugin {
 
     if (!edge) return;
 
-    // 只在第一次 retract 时记录原始位置
     this.expandedBounds = { ...bounds };
     this.currentEdge = edge;
 
     this.isAnimating = true;
-    win.setBounds(target, this.config.animate);
+    win.setBounds(target, false);
 
     setTimeout(() => {
       this.isAnimating = false;
-    }, 200);
+    }, 100);
   }
 
   expand(win) {
     if (!this.currentEdge || !this.expandedBounds) return;
 
-    this.isAnimating = true;
-    win.setBounds(this.expandedBounds, this.config.animate);
+    const start = win.getBounds();
+    const end = this.expandedBounds;
 
-    // expand 后给一个“安全期”，防止立刻 mouse_leave
+    this.isAnimating = true;
     this.ignoreLeaveUntil = Date.now() + 300;
 
-    setTimeout(() => {
+    this.animateBounds(win, start, end, () => {
       this.isAnimating = false;
       this.currentEdge = null;
       this.expandedBounds = null;
-    }, 200);
+    });
+  }
+
+  animateBounds(win, from, to, done) {
+    const frames = Math.max(
+      1,
+      Math.floor((this.config.expandDuration / 1000) * this.config.expandFPS)
+    );
+
+    let frame = 0;
+
+    const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+
+    const timer = setInterval(() => {
+      frame++;
+      const t = easeOut(frame / frames);
+
+      const x = Math.round(from.x + (to.x - from.x) * t);
+      const y = Math.round(from.y + (to.y - from.y) * t);
+
+      win.setBounds(
+        {
+          x,
+          y,
+          width: from.width,
+          height: from.height,
+        },
+        false
+      );
+
+      if (frame >= frames) {
+        clearInterval(timer);
+        win.setBounds(to, false);
+        done?.();
+      }
+    }, 1000 / this.config.expandFPS);
   }
 
   deactivate() {
