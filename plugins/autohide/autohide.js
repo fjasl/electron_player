@@ -6,7 +6,7 @@ class WindowHidePlugin {
     this.api = null;
 
     this.config = {
-      threshold: 50,
+      threshold: 80,
       gap: 5,
       animate: true,
       expandDuration: 180, // ms
@@ -127,7 +127,7 @@ class WindowHidePlugin {
 
     setTimeout(() => {
       this.isAnimating = false;
-    }, 100);
+    }, 150);
   }
 
   expand(win) {
