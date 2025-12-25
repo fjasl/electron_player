@@ -103,12 +103,14 @@ async function switchToIndex(index, ctx) {
 
 /** 双击列表播放 / 选择列表某首歌 */
 async function handlePlayListTrack(payload, ctx) {
+  const {eventBus} = ctx;
   const { index } = payload || {};
 
   if (typeof index !== "number" || index < 0) {
     // console.warn("[play_list_track] invalid index:", index);
     return;
   }
+  eventBus.emit("song_switched",{});
   await switchToIndex(index, ctx);
 }
 
@@ -270,12 +272,22 @@ function handleVolumeChange(_payload, ctx) {
   });
 }
 
+function handlePlayEnd(_payload,ctx){
+  const { stateStore, storage, eventBus } = ctx;
+  eventBus.log("触发了播放后回调");
+  eventBus.emit("play_ended_reply", {
+    
+    });
+}
+
+
 /** 对外：注册所有播放相关的 intent */
 function registerPlaybackHandlers(stateMachine) {
   stateMachine.registerHandler("play_list_track", handlePlayListTrack);
   stateMachine.registerHandler("play_next", handlePlayNext);
   stateMachine.registerHandler("play_prev", handlePlayPrev);
   stateMachine.registerHandler("play_toggle", handlePlayToggle);
+  stateMachine.registerHandler("play_ended",handlePlayEnd);
   stateMachine.registerHandler("set_play_mode", handleSetPlayMode);
   stateMachine.registerHandler("seek", handleSeek);
   stateMachine.registerHandler("position_report", handlePositionReport);

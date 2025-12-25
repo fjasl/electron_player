@@ -39,8 +39,6 @@ class PlayUIController {
     this.isLiked = false;
     this.playMode = "one"; // loop | one | shuffle
 
-   
-
     // 回调接口（让后端 / 播放核心接管）
     this.callbacks = {
       onReturn: null,
@@ -133,8 +131,6 @@ class PlayUIController {
       this.callbacks.onVolumeChange?.(percent);
       // 通知后端 / audio
     });
-
-  
 
     // 保持原有鼠标悬浮不消失逻辑
     this.dom.volumeBox?.addEventListener("mouseenter", () => {
@@ -269,12 +265,25 @@ class PlayUIController {
     else if (mode === "shuffle") icon.className = "fa-solid fa-shuffle";
   }
 
+  updateVolumeUI(volume) {
+    const icon = this.dom.btnVolume.querySelector("i");
+
+    if (volume === 0) {
+      icon.className = "fa-solid fa-volume-mute";
+    }
+    if (volume > 0 && volume < 0.5) {
+      icon.className = "fa-solid fa-volume-low";
+    } else if (volume > 0.5 && volume < 1) {
+      icon.className = "fa-solid fa-volume-high";
+    }
+  }
+
   // ================================
   // 音量 UI 更新
   // ================================
   setVolume(volume01) {
     this.volume = Math.max(0, Math.min(1, volume01));
-
+    this.updateVolumeUI(this.volume);
     if (this.dom.volumeFill) {
       this.dom.volumeFill.style.height = `${this.volume * 100}%`;
     }

@@ -40,10 +40,11 @@ audioManager.callbacks.onProgress = (position, duration) => {
 };
 
 audioManager.callbacks.onEnded = () => {
+  settingManager.addLog("播放结束");
+  sendIntent("play_ended", {})
   //console.log("[frontend] audio ended → play_next");
   sendIntent("play_next", {});
 };
-
 // ============== 播放界面 → AudioManager / 后端意图 ==============
 
 // 播放/暂停：只控制 <audio>，后端通过 audio 事件感知
@@ -293,11 +294,11 @@ ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
   }
   if (name === "plug_event") {
     settingManager.addLog("执行了一次plug_event");
-    console.log("执行了一次plug_event"+payload?.name);
+    console.log("执行了一次plug_event" + payload?.name);
     console.log(settingManager.activePlugName);
     if (settingManager.activePlugName === payload?.name) {
       settingManager.addLog("修改了serverUI");
-      settingManager.sendMessageToWrench(payload?.intent,payload?.data);
+      settingManager.sendMessageToWrench(payload?.intent, payload?.data);
     }
   }
 });

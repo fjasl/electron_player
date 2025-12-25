@@ -379,7 +379,7 @@ class ServerPlugin {
       });
     };
 
-    ["position_changed"].forEach((event) => {
+    ["play_ended_reply","seek_reply","song_switched"].forEach((event) => {
       this.api.on(event, (data) => broadcast(data, event));
     });
 
