@@ -34,8 +34,8 @@
       "!startInstallPlugins.bat",
       "!.gitignore",
       "!versionReadme/*",
-      "!package,json",
-      "!package-lock,json"
+      "!package.json",
+      "!package-lock.json"
     ],
     "extraFiles": [
       {
@@ -58,7 +58,8 @@
       "output": "dist"
     },
     "win": {
-      "target": "zip"
+      "target": "nsis",
+      "icon": "icon.ico"
     }
   },
   "license": "ISC"

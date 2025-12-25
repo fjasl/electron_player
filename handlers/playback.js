@@ -274,7 +274,6 @@ function handleVolumeChange(_payload, ctx) {
 
 function handlePlayEnd(_payload,ctx){
   const { stateStore, storage, eventBus } = ctx;
-  eventBus.log("触发了播放后回调");
   eventBus.emit("play_ended_reply", {
     
     });

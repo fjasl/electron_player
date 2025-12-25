@@ -55,7 +55,6 @@ class DiscoManager {
      */
     setRotationRate(degreesPerSecond) {
         this.rotationRateDegreesPerSecond = degreesPerSecond;
-        console.log(`旋转速度更新为 ${degreesPerSecond} 度/秒`);
     }
 
     /**
@@ -82,12 +81,10 @@ class DiscoManager {
         this.isPlaying = play;
 
         if (play) {
-            console.log("开始旋转 (JS rAF 控制)");
             // 启动 rAF 循环
             this.lastTime = null; // 重置时间，防止启动时跳帧
             this.animationId = requestAnimationFrame(this.animationLoop);
         } else {
-            console.log("暂停旋转");
             // 停止 rAF 循环
             if (this.animationId) {
                 cancelAnimationFrame(this.animationId);

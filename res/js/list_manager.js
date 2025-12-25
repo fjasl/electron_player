@@ -119,11 +119,9 @@ class ListUIController {
     const { el } = itemData;
     const delBox = el.querySelector(".list_item_del_box");
     const conTactBtn = el.querySelector(".list_item_lyric_bind_box");
-    console.log("[绑定按钮检查]:" + conTactBtn);
 
     if (conTactBtn) {
       conTactBtn.addEventListener("click", (e) => {
-        console.log("[绑定按钮触发]");
         e.stopPropagation();
         this.callbacks.onContactLyric?.(itemData);
       });

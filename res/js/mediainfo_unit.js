@@ -62,47 +62,7 @@ class MediaControl {
     });
   }
 
-  // 设置媒体元数据
-  //   updateMetadata(metadata) {
-  //     if ("mediaSession" in navigator) {
-  //       const { title, artist } = metadata;
-
-  //       this.mediaSession.metadata = new MediaMetadata({
-  //         title: title || "Unknown Title",
-  //         artist: artist || "Unknown Artist",
-  //       });
-  //     }
-  //   }
-
-  //   updateCover(meta) {
-  //     if ("mediaSession" in navigator) {
-  //       const { cover } = meta;
-
-  //       this.mediaSession.metadata = new MediaMetadata({
-  //         artwork: [{ src: cover, sizes: "96x96", type: "image/jpg" }] || [
-  //           { src: "default-artwork.jpg", sizes: "96x96", type: "image/jpg" },
-  //         ],
-  //       });
-  //       console.log("控件封面加载执行");
-  //     }
-  //   }
-
-  // 暴露回调方法
-//   onPlay(callback) {
-//     this.onPlay = callback;
-//   }
-
-//   onPause(callback) {
-//     this.onPause = callback;
-//   }
-
-//   onNext(callback) {
-//     this.onNext = callback;
-//   }
-
-//   onPrev(callback) {
-//     this.onPrev = callback;
-//   }
+  
 }
 
 window.MediaControl = MediaControl;
