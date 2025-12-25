@@ -80,7 +80,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent; /* ★ 窗口其余区域完全透明 */
+   background: rgba(0, 0, 0, 0.01);/* ★ 窗口其余区域完全透明 */
   font-family: "SourceHanSansSC";
   font-weight: 400; /* 默认常规 */
 }

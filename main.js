@@ -15,6 +15,7 @@ function createWindow() {
     frame: false,
     resizable: false,
     transparent: true,
+    alwaysOnTop: true,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -96,6 +97,9 @@ function createTray() {
 app.whenReady().then(async () => {
   // 获取 asar 文件的父目录路径 (即 win-unpacked 目录)
   createWindow();
+  // 在 main.js 创建窗口后立即调用
+  win.setIgnoreMouseEvents(false);
+
   createTray();
   stateStoreInstance = await initBackend(win);
 });

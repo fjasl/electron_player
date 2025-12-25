@@ -21,6 +21,7 @@ const lyricManager = new LyricManager();
 
 const settingManager = new SettingManager();
 
+const windowEventManager = new Window_Events_Manager();
 // 记录当前 audio 正在播放的那一首（用后端的 track.path）
 let currentAudioTrackPath = null;
 
@@ -41,7 +42,7 @@ audioManager.callbacks.onProgress = (position, duration) => {
 
 audioManager.callbacks.onEnded = () => {
   settingManager.addLog("播放结束");
-  sendIntent("play_ended", {})
+  sendIntent("play_ended", {});
   //console.log("[frontend] audio ended → play_next");
   sendIntent("play_next", {});
 };
@@ -183,6 +184,24 @@ settingManager.callbacks.onPlugSelected = (name) => {
   sendIntent("plugin_ui_request", { name: name });
 };
 
+//==============window_events+manager.js========
+windowEventManager.callbacks.onMouseEnter = () => {
+  settingManager.addLog("光标进入窗口");
+  sendIntent("window_event_mouse_enter",{});
+};
+
+windowEventManager.callbacks.onMouseLeave = () => {
+  settingManager.addLog("光标离开窗口");
+  sendIntent("window_event_mouse_leave",{});
+};
+windowEventManager.callbacks.onMouseFocus = () => {
+  settingManager.addLog("窗口聚焦");
+  sendIntent("window_event_focus",{});
+};
+windowEventManager.callbacks.onMouseBlur = () => {
+  settingManager.addLog("窗口失焦");
+  sendIntent("window_event_blur",{});
+};
 // 监听后端 EventBus 发来的事件
 ipcRenderer.on("backend-event", (_event, { event: name, payload }) => {
   // //console.log("[frontend] backend-event:", name, payload);
