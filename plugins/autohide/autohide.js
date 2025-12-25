@@ -17,27 +17,61 @@ class WindowHidePlugin {
     this.expandedBounds = null;
     this.isAnimating = false;
     this.ignoreLeaveUntil = 0;
+
+    this.status = false;
   }
 
   activate(api) {
     this.api = api;
 
+    try {
+      this.status = this.api.statePasser.getPluginByName(this.name).status;
+    } catch (error) {
+      this.api.log("没有找到状态 默认关闭自动隐藏窗口" + error);
+      this.api.statePasser.upsertPlugin({
+        name: this.name,
+        status: this.status,
+      });
+      this.api.storagePasser.saveState(this.api.statePasser.getState());
+    }
+
     if (this.api.winPasser) {
       this.api.winPasser.setAlwaysOnTop(true, "screen-saver");
     }
 
-    this.api.registerIntent("window_event_mouse_enter", () =>
-      this.handleEvent("enter")
-    );
-    this.api.registerIntent("window_event_mouse_leave", () =>
-      this.handleEvent("leave")
-    );
-    this.api.registerIntent("window_event_focus", () =>
-      this.handleEvent("focus")
-    );
-    this.api.registerIntent("window_event_blur", () =>
-      this.handleEvent("blur")
-    );
+    this.api.registerIntent("autohide_plugin_loaded", (payload, ctx) => {
+      this.api.eventPasser.plug_emit(this.name, "current_status", {
+        status: this.status,
+      });
+      this.api.log("发送一次当前状态");
+    });
+
+    this.api.registerIntent("autohide_plugin_status_change", (payload, ctx) => {
+      this.api.statePasser.upsertPlugin({
+        name: this.name,
+        status: payload.status,
+      });
+      this.status = payload.status;
+      this.api.storagePasser.saveState(this.api.statePasser.getState());
+      this.api.log("状态成功保存");
+    });
+
+    this.api.registerIntent("window_event_mouse_enter", () => {
+      if (!this.status) return;
+      this.handleEvent("enter");
+    });
+    this.api.registerIntent("window_event_mouse_leave", () => {
+      if (!this.status) return;
+      this.handleEvent("leave");
+    });
+    this.api.registerIntent("window_event_focus", () => {
+      if (!this.status) return;
+      this.handleEvent("focus");
+    });
+    this.api.registerIntent("window_event_blur", () => {
+      if (!this.status) return;
+      this.handleEvent("blur");
+    });
   }
 
   handleEvent(type) {

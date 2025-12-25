@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Settings</title>
 
     <style>
       * {
@@ -17,13 +18,22 @@
         height: 100%;
         font-family: system-ui, -apple-system, sans-serif;
         overflow: hidden;
-        background: inherit;
+        background: black;
       }
 
-     
+      #main_box {
+        width: 100%;
+        height: 100%;
+        background: inherit;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
 
       #setting_box {
-        width: 100%;
+        width: 80%;
         height: 100%;
         background: inherit;
       }
@@ -60,7 +70,9 @@
         cursor: default;
         user-select: none;
 
-        transition: background-color 0.18s ease, border-color 0.18s ease,
+        transition:
+          background-color 0.18s ease,
+          border-color 0.18s ease,
           transform 0.12s ease;
       }
 
@@ -71,7 +83,7 @@
 
       .list_item:active {
         transform: scale(0.98);
-        background: rgba(81, 180, 250, 0.18);
+        background: rgba(255, 255, 255, 0.18);
       }
 
       /* ===== 左侧文本 ===== */
@@ -130,7 +142,7 @@
       }
 
       .switch input:checked + .slider {
-        background: #87c0d1;
+        background: rgba(255, 255, 255, 0.35);
       }
 
       .switch input:checked + .slider::before {
@@ -140,66 +152,38 @@
   </head>
 
   <body>
-    <div id="setting_box">
-      <div id="list_box">
-        <div class="list_item">
-          <div class="item_text">
-            <div class="item_title">启用窗口贴边自动隐藏</div>
-            <div class="item_desc">
-              当窗口靠近屏幕边缘时自动隐藏，鼠标移入时显示。建议只隐藏在顶部
+    <div id="main_box">
+      <div id="setting_box">
+        <div id="list_box">
+          <div class="list_item">
+            <div class="item_text">
+              <div class="item_title">新建标签页加载默认搜索栏</div>
+              <div class="item_desc">
+                开启后，新标签页的地址栏会显示 [limestart.cn] 网站。
+              </div>
             </div>
+
+            <label class="switch">
+              <input type="checkbox" />
+              <span class="slider"></span>
+            </label>
           </div>
 
-          <label class="switch">
-            <input type="checkbox" checked id="autohide_switch" />
-            <span class="slider"></span>
-          </label>
+          <div class="list_item">
+            <div class="item_text">
+              <div class="item_title">启用窗口贴边自动隐藏</div>
+              <div class="item_desc">
+                当窗口靠近屏幕边缘时自动隐藏，鼠标移入时显示。
+              </div>
+            </div>
+
+            <label class="switch">
+              <input type="checkbox" checked />
+              <span class="slider"></span>
+            </label>
+          </div>
         </div>
       </div>
     </div>
-    <script>
-      const switchEl = document.getElementById("autohide_switch");
-
-      /* 页面加载，通知插件 iframe 已就绪 */
-      window.addEventListener("DOMContentLoaded", () => {
-        window.parent.postMessage(
-          {
-            source: "iframe-plugin-api",
-            intent: "autohide_plugin_loaded",
-            payload: {},
-          },
-          "*"
-        );
-      });
-
-      /* 接收主窗口 / 插件消息 */
-      window.addEventListener("message", (event) => {
-        if (!event.data || event.data.source !== "main-window-api") return;
-
-        const { intent, payload } = event.data;
-
-        switch (intent) {
-          case "current_status":
-            if (typeof payload.status === "boolean") {
-              switchEl.checked = payload.status;
-            }
-            break;
-        }
-      });
-
-      /* 用户切换开关 → 通知插件 */
-      switchEl.addEventListener("change", () => {
-        window.parent.postMessage(
-          {
-            source: "iframe-plugin-api",
-            intent: "autohide_plugin_status_change",
-            payload: {
-              status: switchEl.checked,
-            },
-          },
-          "*"
-        );
-      });
-    </script>
   </body>
 </html>
