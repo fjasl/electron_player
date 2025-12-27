@@ -5,6 +5,7 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
+  transition: transform 0.2s ease;
 }
 #return_btn i {
   font-size: 25px;
@@ -12,6 +13,7 @@
   width: 1.25em; /* 对齐 Font Awesome */
   text-align: center;
   color: white;
+   
 }
 #songinfo {
   flex: 1;
@@ -61,6 +63,7 @@
   line-height: 1;
   width: 1.25em;
   text-align: center;
+  transition: transform 0.2s ease;
 }
 .list_item {
   flex: 0 0 20%;
@@ -170,6 +173,7 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
+  transition: transform 0.2s ease;
 }
 .setting_func_box i {
   font-size: 20px;

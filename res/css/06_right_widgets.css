@@ -23,6 +23,7 @@
   display: flex;
   align-items: center;
   cursor: pointer;
+  transition: transform 0.2s ease;
 }
 .func_set_btn i {
   font-size: 20px;
@@ -70,6 +71,9 @@
   color: rgba(255, 255, 255, 0.6);
 }
 
+.control_btn{
+  transition: transform 0.2s ease;
+}
 #control_play_btn {
   width: 20%;
   height: 100%;

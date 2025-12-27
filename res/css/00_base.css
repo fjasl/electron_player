@@ -53,12 +53,11 @@
 }
 
 @font-face {
-  font-family: 'localsegoesc'; /* 使用你指定的名称 */
-  src: url('../font/segoesc.ttf') format('truetype'); /* 指向你指定的相对路径和文件名 */
+  font-family: "localsegoesc"; /* 使用你指定的名称 */
+  src: url("../font/segoesc.ttf") format("truetype"); /* 指向你指定的相对路径和文件名 */
   font-weight: normal;
   font-style: normal;
 }
-
 
 ::selection {
   background-color: transparent;
@@ -80,7 +79,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-   background: transparent;/* ★ 窗口其余区域完全透明 */
+  background: transparent; /* ★ 窗口其余区域完全透明 */
   font-family: "SourceHanSansSC";
   font-weight: 400; /* 默认常规 */
 }
@@ -91,6 +90,10 @@ body {
   text-overflow: ellipsis; /* 显示 … */
 }
 
-.button_active{
+.button_active {
   color: #87c0d1;
+}
+
+.button_hover:hover {
+  transform: scale(0.85);
 }
