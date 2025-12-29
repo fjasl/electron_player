@@ -35,10 +35,6 @@ class WindowHidePlugin {
       this.api.storagePasser.saveState(this.api.statePasser.getState());
     }
 
-    if (this.api.winPasser) {
-      this.api.winPasser.setAlwaysOnTop(true, "screen-saver");
-    }
-
     this.api.registerIntent("autohide_plugin_loaded", (payload, ctx) => {
       this.api.eventPasser.plug_emit(this.name, "current_status", {
         status: this.status,
@@ -51,6 +47,15 @@ class WindowHidePlugin {
         name: this.name,
         status: payload.status,
       });
+      if (!this.status) {
+        if (this.api.winPasser) {
+          this.api.winPasser.setAlwaysOnTop(true, "screen-saver");
+        }
+      } else {
+        if (this.api.winPasser) {
+          this.api.winPasser.setAlwaysOnTop(false);
+        }
+      }
       this.status = payload.status;
       this.api.storagePasser.saveState(this.api.statePasser.getState());
       this.api.log("状态成功保存");

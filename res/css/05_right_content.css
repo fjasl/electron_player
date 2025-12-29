@@ -76,7 +76,8 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-left-color: transparent;
   border-right-color: transparent;
-  background: rgba(255, 255, 255, 0.02);
+  /* background: rgba(255, 255, 255, 0.02); */
+  background-color: transparent;
   color: #ffffffd5;
   cursor: pointer;
   user-select: none;
